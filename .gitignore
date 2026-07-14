@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Database
+*.db
+*.sqlite3
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+
+# Build artifacts / temp
+*.log
+.DS_Store
+backend/sandbox/tmp/
+backend/sandbox/artifacts/
+
+# Word lock files
+~$*.docx
+
+# Raw zip (CSV udah di-extract ke datasets/)
+*.csv.zip

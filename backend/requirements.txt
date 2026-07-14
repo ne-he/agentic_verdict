@@ -1,0 +1,24 @@
+# Runtime deps untuk deploy (Render). Versi DIKUNCI (mirror pyproject.toml).
+# Dev tools (pytest) tidak termasuk — install lewat `pip install -e .[dev]` saat lokal.
+
+fastapi==0.115.*
+uvicorn[standard]==0.32.*
+pydantic==2.9.*
+pydantic-settings==2.6.*
+google-genai==0.8.*
+duckdb==1.1.*
+matplotlib==3.9.*
+pandas==2.2.*
+scipy==1.14.*
+python-dotenv==1.0.*
+httpx==0.27.*
+sqlalchemy==2.0.*
+
+# Driver Postgres untuk Neon (dipakai kalau DATABASE_URL=postgresql://...).
+# SQLite tidak butuh driver tambahan.
+psycopg2-binary==2.9.*
+
+# Docker SDK — hanya terpakai kalau USE_DOCKER=true (import lazy).
+# Di Render set USE_DOCKER=false (no Docker-in-Docker) → praktis tak terpakai,
+# tetap di-pin biar host yang mendukung Docker bisa pakai sandbox penuh.
+docker==7.1.*

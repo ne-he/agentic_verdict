@@ -1,0 +1,975 @@
+{
+  "AnalyzeRequest": {
+    "description": "Pertanyaan analitik dari user terhadap sebuah dataset.",
+    "properties": {
+      "question": {
+        "minLength": 1,
+        "title": "Question",
+        "type": "string"
+      },
+      "dataset_id": {
+        "minLength": 1,
+        "title": "Dataset Id",
+        "type": "string"
+      },
+      "session_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Session Id"
+      }
+    },
+    "required": [
+      "question",
+      "dataset_id"
+    ],
+    "title": "AnalyzeRequest",
+    "type": "object"
+  },
+  "PlanStep": {
+    "description": "Satu langkah eksplisit dari planner. Juga menyetir progress bar UI.",
+    "properties": {
+      "id": {
+        "title": "Id",
+        "type": "integer"
+      },
+      "description": {
+        "title": "Description",
+        "type": "string"
+      },
+      "tool": {
+        "title": "Tool",
+        "type": "string"
+      },
+      "status": {
+        "default": "pending",
+        "enum": [
+          "pending",
+          "running",
+          "done",
+          "error"
+        ],
+        "title": "Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "description",
+      "tool"
+    ],
+    "title": "PlanStep",
+    "type": "object"
+  },
+  "ToolCall": {
+    "description": "Catatan satu pemanggilan tool (untuk execution trace / 'show your work').",
+    "properties": {
+      "tool": {
+        "title": "Tool",
+        "type": "string"
+      },
+      "input": {
+        "title": "Input",
+        "type": "object"
+      },
+      "output": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Output"
+      },
+      "error": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Error"
+      },
+      "duration_ms": {
+        "default": 0,
+        "title": "Duration Ms",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "tool"
+    ],
+    "title": "ToolCall",
+    "type": "object"
+  },
+  "VerificationResult": {
+    "description": "Hasil self-verify: angka kunci dihitung 2 metode lalu dibandingkan.",
+    "properties": {
+      "method_a": {
+        "title": "Method A",
+        "type": "string"
+      },
+      "method_b": {
+        "title": "Method B",
+        "type": "string"
+      },
+      "agreement": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Agreement",
+        "type": "number"
+      },
+      "contradictions": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Contradictions",
+        "type": "array"
+      },
+      "passed": {
+        "title": "Passed",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "method_a",
+      "method_b",
+      "agreement",
+      "passed"
+    ],
+    "title": "VerificationResult",
+    "type": "object"
+  },
+  "ConfidenceBreakdown": {
+    "description": "Computed confidence (Blueprint \u00a74.5) \u2014 BUKAN tebakan LLM.\n\nfinal = 0.40*answer_consistency + 0.30*verification_agreement\n      + 0.20*tool_execution_success + 0.10*data_coverage",
+    "properties": {
+      "answer_consistency": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Answer Consistency",
+        "type": "number"
+      },
+      "verification_agreement": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Verification Agreement",
+        "type": "number"
+      },
+      "tool_execution_success": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Tool Execution Success",
+        "type": "number"
+      },
+      "data_coverage": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Data Coverage",
+        "type": "number"
+      },
+      "final": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Final",
+        "type": "number"
+      },
+      "label": {
+        "enum": [
+          "HIGH",
+          "MEDIUM",
+          "LOW"
+        ],
+        "title": "Label",
+        "type": "string"
+      }
+    },
+    "required": [
+      "answer_consistency",
+      "verification_agreement",
+      "tool_execution_success",
+      "data_coverage",
+      "final",
+      "label"
+    ],
+    "title": "ConfidenceBreakdown",
+    "type": "object"
+  },
+  "AnalysisResult": {
+    "$defs": {
+      "ConfidenceBreakdown": {
+        "description": "Computed confidence (Blueprint \u00a74.5) \u2014 BUKAN tebakan LLM.\n\nfinal = 0.40*answer_consistency + 0.30*verification_agreement\n      + 0.20*tool_execution_success + 0.10*data_coverage",
+        "properties": {
+          "answer_consistency": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Answer Consistency",
+            "type": "number"
+          },
+          "verification_agreement": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Verification Agreement",
+            "type": "number"
+          },
+          "tool_execution_success": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Tool Execution Success",
+            "type": "number"
+          },
+          "data_coverage": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Data Coverage",
+            "type": "number"
+          },
+          "final": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Final",
+            "type": "number"
+          },
+          "label": {
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "LOW"
+            ],
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer_consistency",
+          "verification_agreement",
+          "tool_execution_success",
+          "data_coverage",
+          "final",
+          "label"
+        ],
+        "title": "ConfidenceBreakdown",
+        "type": "object"
+      },
+      "ToolCall": {
+        "description": "Catatan satu pemanggilan tool (untuk execution trace / 'show your work').",
+        "properties": {
+          "tool": {
+            "title": "Tool",
+            "type": "string"
+          },
+          "input": {
+            "title": "Input",
+            "type": "object"
+          },
+          "output": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Output"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "duration_ms": {
+            "default": 0,
+            "title": "Duration Ms",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tool"
+        ],
+        "title": "ToolCall",
+        "type": "object"
+      },
+      "VerificationResult": {
+        "description": "Hasil self-verify: angka kunci dihitung 2 metode lalu dibandingkan.",
+        "properties": {
+          "method_a": {
+            "title": "Method A",
+            "type": "string"
+          },
+          "method_b": {
+            "title": "Method B",
+            "type": "string"
+          },
+          "agreement": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Agreement",
+            "type": "number"
+          },
+          "contradictions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Contradictions",
+            "type": "array"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "method_a",
+          "method_b",
+          "agreement",
+          "passed"
+        ],
+        "title": "VerificationResult",
+        "type": "object"
+      }
+    },
+    "description": "Bundle lengkap satu run: jawaban + kode + chart + verifikasi + confidence.",
+    "properties": {
+      "run_id": {
+        "title": "Run Id",
+        "type": "string"
+      },
+      "answer_markdown": {
+        "title": "Answer Markdown",
+        "type": "string"
+      },
+      "code": {
+        "title": "Code",
+        "type": "string"
+      },
+      "dataset_id": {
+        "default": "",
+        "title": "Dataset Id",
+        "type": "string"
+      },
+      "dataset_snapshot": {
+        "default": "",
+        "title": "Dataset Snapshot",
+        "type": "string"
+      },
+      "chart_paths": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Chart Paths",
+        "type": "array"
+      },
+      "verification": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/VerificationResult"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "confidence": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ConfidenceBreakdown"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "tool_calls": {
+        "items": {
+          "$ref": "#/$defs/ToolCall"
+        },
+        "title": "Tool Calls",
+        "type": "array"
+      },
+      "tokens": {
+        "default": 0,
+        "title": "Tokens",
+        "type": "integer"
+      },
+      "cost_usd": {
+        "default": 0.0,
+        "title": "Cost Usd",
+        "type": "number"
+      },
+      "duration_ms": {
+        "default": 0,
+        "title": "Duration Ms",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "run_id",
+      "answer_markdown",
+      "code"
+    ],
+    "title": "AnalysisResult",
+    "type": "object"
+  },
+  "SSEEvent": {
+    "description": "Satu event yang di-stream ke frontend selama analisis berjalan.",
+    "properties": {
+      "type": {
+        "enum": [
+          "plan",
+          "step",
+          "tool",
+          "chart",
+          "verify",
+          "confidence",
+          "final",
+          "error"
+        ],
+        "title": "Type",
+        "type": "string"
+      },
+      "data": {
+        "title": "Data",
+        "type": "object"
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "title": "SSEEvent",
+    "type": "object"
+  },
+  "Scorecard": {
+    "description": "Nilai satu run terhadap gold answer (dihasilkan eval harness).",
+    "properties": {
+      "run_id": {
+        "title": "Run Id",
+        "type": "string"
+      },
+      "question_id": {
+        "default": "",
+        "title": "Question Id",
+        "type": "string"
+      },
+      "correctness": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Correctness",
+        "type": "number"
+      },
+      "cost_usd": {
+        "default": 0.0,
+        "title": "Cost Usd",
+        "type": "number"
+      },
+      "tool_calls": {
+        "default": 0,
+        "title": "Tool Calls",
+        "type": "integer"
+      },
+      "time_to_insight": {
+        "default": 0.0,
+        "title": "Time To Insight",
+        "type": "number"
+      },
+      "hallucination_flag": {
+        "default": false,
+        "title": "Hallucination Flag",
+        "type": "boolean"
+      },
+      "verification_accuracy": {
+        "default": 0.0,
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Verification Accuracy",
+        "type": "number"
+      }
+    },
+    "required": [
+      "run_id",
+      "correctness"
+    ],
+    "title": "Scorecard",
+    "type": "object"
+  },
+  "GoldQuestion": {
+    "description": "Satu pertanyaan dalam gold set (divalidasi saat load).",
+    "properties": {
+      "id": {
+        "title": "Id",
+        "type": "string"
+      },
+      "category": {
+        "title": "Category",
+        "type": "string"
+      },
+      "question": {
+        "title": "Question",
+        "type": "string"
+      },
+      "gold_answer": {
+        "title": "Gold Answer",
+        "type": "string"
+      },
+      "gold_code": {
+        "title": "Gold Code",
+        "type": "string"
+      },
+      "expected_value": {
+        "title": "Expected Value",
+        "type": "number"
+      },
+      "allowed_tolerance": {
+        "default": 0.01,
+        "title": "Allowed Tolerance",
+        "type": "number"
+      },
+      "is_trap": {
+        "default": false,
+        "title": "Is Trap",
+        "type": "boolean"
+      },
+      "trap_note": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Trap Note"
+      }
+    },
+    "required": [
+      "id",
+      "category",
+      "question",
+      "gold_answer",
+      "gold_code",
+      "expected_value"
+    ],
+    "title": "GoldQuestion",
+    "type": "object"
+  },
+  "GoldSet": {
+    "$defs": {
+      "GoldQuestion": {
+        "description": "Satu pertanyaan dalam gold set (divalidasi saat load).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "gold_answer": {
+            "title": "Gold Answer",
+            "type": "string"
+          },
+          "gold_code": {
+            "title": "Gold Code",
+            "type": "string"
+          },
+          "expected_value": {
+            "title": "Expected Value",
+            "type": "number"
+          },
+          "allowed_tolerance": {
+            "default": 0.01,
+            "title": "Allowed Tolerance",
+            "type": "number"
+          },
+          "is_trap": {
+            "default": false,
+            "title": "Is Trap",
+            "type": "boolean"
+          },
+          "trap_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Trap Note"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "question",
+          "gold_answer",
+          "gold_code",
+          "expected_value"
+        ],
+        "title": "GoldQuestion",
+        "type": "object"
+      }
+    },
+    "description": "Satu file gold set JSON: metadata dataset + list pertanyaan.",
+    "properties": {
+      "dataset_id": {
+        "title": "Dataset Id",
+        "type": "string"
+      },
+      "dataset_file": {
+        "title": "Dataset File",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "utf-8",
+        "title": "Encoding",
+        "type": "string"
+      },
+      "date_columns": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Date Columns",
+        "type": "array"
+      },
+      "date_format": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Date Format"
+      },
+      "note": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Note"
+      },
+      "questions": {
+        "items": {
+          "$ref": "#/$defs/GoldQuestion"
+        },
+        "title": "Questions",
+        "type": "array"
+      }
+    },
+    "required": [
+      "dataset_id",
+      "dataset_file",
+      "questions"
+    ],
+    "title": "GoldSet",
+    "type": "object"
+  },
+  "BatchSummary": {
+    "description": "Agregat hasil batch eval (semua pertanyaan dalam satu batch run).",
+    "properties": {
+      "total": {
+        "title": "Total",
+        "type": "integer"
+      },
+      "avg_correctness": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Avg Correctness",
+        "type": "number"
+      },
+      "total_cost_usd": {
+        "default": 0.0,
+        "title": "Total Cost Usd",
+        "type": "number"
+      },
+      "hallucination_rate": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "title": "Hallucination Rate",
+        "type": "number"
+      },
+      "avg_tool_calls": {
+        "default": 0.0,
+        "title": "Avg Tool Calls",
+        "type": "number"
+      },
+      "avg_time_to_insight": {
+        "default": 0.0,
+        "title": "Avg Time To Insight",
+        "type": "number"
+      },
+      "run_ids": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Run Ids",
+        "type": "array"
+      }
+    },
+    "required": [
+      "total",
+      "avg_correctness",
+      "hallucination_rate"
+    ],
+    "title": "BatchSummary",
+    "type": "object"
+  },
+  "RunRecord": {
+    "description": "Satu run historis yang diambil dari DB (GET /run/{id}).",
+    "properties": {
+      "run_id": {
+        "title": "Run Id",
+        "type": "string"
+      },
+      "dataset_id": {
+        "title": "Dataset Id",
+        "type": "string"
+      },
+      "dataset_snapshot": {
+        "default": "",
+        "title": "Dataset Snapshot",
+        "type": "string"
+      },
+      "question": {
+        "title": "Question",
+        "type": "string"
+      },
+      "answer_markdown": {
+        "title": "Answer Markdown",
+        "type": "string"
+      },
+      "code": {
+        "default": "",
+        "title": "Code",
+        "type": "string"
+      },
+      "tokens": {
+        "default": 0,
+        "title": "Tokens",
+        "type": "integer"
+      },
+      "cost_usd": {
+        "default": 0.0,
+        "title": "Cost Usd",
+        "type": "number"
+      },
+      "duration_ms": {
+        "default": 0,
+        "title": "Duration Ms",
+        "type": "integer"
+      },
+      "chart_paths": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Chart Paths",
+        "type": "array"
+      },
+      "created_at": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Created At"
+      }
+    },
+    "required": [
+      "run_id",
+      "dataset_id",
+      "question",
+      "answer_markdown"
+    ],
+    "title": "RunRecord",
+    "type": "object"
+  },
+  "DatasetInfo": {
+    "description": "Metadata satu dataset yang tersedia (GET /datasets).",
+    "properties": {
+      "dataset_id": {
+        "title": "Dataset Id",
+        "type": "string"
+      },
+      "file": {
+        "title": "File",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "utf-8",
+        "title": "Encoding",
+        "type": "string"
+      }
+    },
+    "required": [
+      "dataset_id",
+      "file"
+    ],
+    "title": "DatasetInfo",
+    "type": "object"
+  },
+  "EvalDashboard": {
+    "$defs": {
+      "BatchSummary": {
+        "description": "Agregat hasil batch eval (semua pertanyaan dalam satu batch run).",
+        "properties": {
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "avg_correctness": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Avg Correctness",
+            "type": "number"
+          },
+          "total_cost_usd": {
+            "default": 0.0,
+            "title": "Total Cost Usd",
+            "type": "number"
+          },
+          "hallucination_rate": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Hallucination Rate",
+            "type": "number"
+          },
+          "avg_tool_calls": {
+            "default": 0.0,
+            "title": "Avg Tool Calls",
+            "type": "number"
+          },
+          "avg_time_to_insight": {
+            "default": 0.0,
+            "title": "Avg Time To Insight",
+            "type": "number"
+          },
+          "run_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Run Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "total",
+          "avg_correctness",
+          "hallucination_rate"
+        ],
+        "title": "BatchSummary",
+        "type": "object"
+      },
+      "Scorecard": {
+        "description": "Nilai satu run terhadap gold answer (dihasilkan eval harness).",
+        "properties": {
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "question_id": {
+            "default": "",
+            "title": "Question Id",
+            "type": "string"
+          },
+          "correctness": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Correctness",
+            "type": "number"
+          },
+          "cost_usd": {
+            "default": 0.0,
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "tool_calls": {
+            "default": 0,
+            "title": "Tool Calls",
+            "type": "integer"
+          },
+          "time_to_insight": {
+            "default": 0.0,
+            "title": "Time To Insight",
+            "type": "number"
+          },
+          "hallucination_flag": {
+            "default": false,
+            "title": "Hallucination Flag",
+            "type": "boolean"
+          },
+          "verification_accuracy": {
+            "default": 0.0,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Verification Accuracy",
+            "type": "number"
+          }
+        },
+        "required": [
+          "run_id",
+          "correctness"
+        ],
+        "title": "Scorecard",
+        "type": "object"
+      }
+    },
+    "description": "Metrik agregat + run terbaru untuk failure dashboard (GET /eval/dashboard).",
+    "properties": {
+      "summary": {
+        "$ref": "#/$defs/BatchSummary"
+      },
+      "recent": {
+        "items": {
+          "$ref": "#/$defs/Scorecard"
+        },
+        "title": "Recent",
+        "type": "array"
+      }
+    },
+    "required": [
+      "summary"
+    ],
+    "title": "EvalDashboard",
+    "type": "object"
+  }
+}

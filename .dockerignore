@@ -1,0 +1,14 @@
+# Kecilkan build context + cegah file lokal masuk image.
+**/.venv
+**/venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/*.db
+backend/sandbox/tmp
+backend/sandbox/artifacts
+.git
+.github
+frontend
+docs
+*.log

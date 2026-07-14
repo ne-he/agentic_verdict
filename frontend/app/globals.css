@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Aksen brand — copper dari design. Ganti ke #5a9e6f kalau mau tema hijau. */
+  --accent: #c78d4e;
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: #0c0c0c;
+    color: #e8e8e8;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #262626;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::selection {
+    background: rgba(199, 141, 78, 0.3);
+  }
+  textarea:focus,
+  input:focus {
+    outline: 1px solid var(--accent);
+    outline-offset: -1px;
+  }
+  button:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 1px;
+  }
+}
