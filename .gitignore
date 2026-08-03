@@ -31,3 +31,14 @@ backend/sandbox/artifacts/
 
 # Raw zip (CSV udah di-extract ke datasets/)
 *.csv.zip
+
+# Folder kerja lokal warisan sebelum merge ANALYST x VERDICT.
+# Tidak pernah ke-track git (git ls-files: 0 file) dan tidak ikut ke GitHub.
+# Di-ignore biar `git status` bersih. Isinya dibiarkan di disk, bukan wewenang tooling buat hapus.
+agentic_analyst/
+
+# Tree VERDICT pra-merge (mtime folder = 14 Jul 2026, persis tanggal merge). Duplikat dari
+# backend/ yang sekarang aktif, lengkap dengan .pytest_cache dan .ruff_cache.
+# CLAUDE.md repo ini menandainya read-only reference, jadi diperlakukan sama dengan
+# agentic_analyst/: di-ignore, isinya dibiarkan di disk.
+verdict/

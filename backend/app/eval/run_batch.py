@@ -28,8 +28,10 @@ RunFn = Callable[[str, str], AnalysisResult]
 
 
 def _default_run_fn() -> RunFn:
-    """Buat RunFn default pakai ReactLoop nyata."""
-    loop = ReactLoop()
+    """Buat RunFn default pakai ReactLoop nyata + durable state (bisa di-resume)."""
+    from app.agent.checkpoint import SqliteCheckpointer
+
+    loop = ReactLoop(checkpointer=SqliteCheckpointer())
     return lambda question, dataset_id: loop.run(question, dataset_id)
 
 
@@ -38,6 +40,7 @@ def run_batch(
     max_questions: int | None = None,
     run_fn: RunFn | None = None,
     save_fn: Callable[[Scorecard], None] | None = None,
+    save_run_fn: Callable[[AnalysisResult, str], object] | None = None,
     verbose: bool = True,
 ) -> BatchSummary:
     """Jalankan batch eval dan kembalikan BatchSummary.
@@ -46,7 +49,8 @@ def run_batch(
         gold_dir:       direktori gold set JSON (default: app/eval/gold_set/).
         max_questions:  batasi jumlah pertanyaan (untuk smoke test).
         run_fn:         callable(question, dataset_id) → AnalysisResult (injectable untuk test).
-        save_fn:        callable(Scorecard) → None untuk persist ke DB (injectable).
+        save_fn:        callable(Scorecard) → None untuk persist scorecard (injectable).
+        save_run_fn:    callable(AnalysisResult, question) → None untuk persist run_history.
         verbose:        cetak progress ke stdout.
     """
     if run_fn is None:
@@ -72,17 +76,22 @@ def run_batch(
             if verbose:
                 print(f"       ERROR: {exc}")
             # Buat result kosong supaya scoring tetap jalan (correctness=0)
-            from app.agent.react_loop import ReactLoop as _RL
             result = AnalysisResult(
                 run_id=f"error_{gold_q.id}_{int(time.monotonic()*1000)}",
                 answer_markdown=f"[ERROR] {exc}",
                 code="",
+                dataset_id=gold_set.dataset_id,
                 duration_ms=int((time.monotonic() - t0) * 1000),
+                termination_reason="tool_error",
             )
 
         sc = grade(result, gold_q)
         scorecards.append(sc)
 
+        # Simpan run DULU baru scorecard: scorecards.run_id merujuk run_history.run_id,
+        # dan kalibrasi grader butuh teks jawabannya, bukan cuma skornya.
+        if save_run_fn is not None:
+            save_run_fn(result, gold_q.question)
         if save_fn is not None:
             save_fn(sc)
 
@@ -134,13 +143,25 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    save_fn: Callable[[Scorecard], None] | None = None
+    save_run_fn: Callable[[AnalysisResult, str], object] | None = None
     try:
-        from app.db.repository import save_scorecard
-        save_fn: Callable[[Scorecard], None] | None = save_scorecard
-    except ImportError:
-        save_fn = None
+        from app.db.repository import init_db, save_run, save_scorecard
 
-    run_batch(gold_dir=args.gold_dir, max_questions=args.max_questions, save_fn=save_fn)
+        # BUG FIX: init_db() sebelumnya tidak pernah dipanggil di sini, jadi run
+        # pertama di DB baru selalu kebanjiran "no such table: scorecards".
+        init_db()
+        save_fn = save_scorecard
+        save_run_fn = lambda result, question: save_run(result, question=question)  # noqa: E731
+    except ImportError:
+        pass
+
+    run_batch(
+        gold_dir=args.gold_dir,
+        max_questions=args.max_questions,
+        save_fn=save_fn,
+        save_run_fn=save_run_fn,
+    )
     return 0
 
 

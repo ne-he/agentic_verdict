@@ -1,0 +1,70 @@
+name: CI
+
+# Test suite backend. Tidak butuh secret apa pun:
+# - test yang butuh Docker + image analyst-sandbox nge-skip sendiri lewat _docker_ready()
+# - test yang butuh Gemini live cuma jalan kalau RUN_LIVE=1 (sengaja tidak di-set di sini)
+# Jadi CI merah artinya logic beneran rusak, bukan secret hilang.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-tests:
+    name: pytest (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # pyproject.toml: requires-python = ">=3.11,<3.13"
+        python-version: ["3.11", "3.12"]
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      # Sandbox pakai subprocess, bukan Docker: runner tidak punya image analyst-sandbox.
+      USE_DOCKER: "false"
+      # Tidak ada API key di CI. Config default-nya string kosong, jadi aman.
+      GEMINI_API_KEY: ""
+      # Guard test live Gemini. Biarkan kosong supaya test itu tetap di-skip.
+      RUN_LIVE: ""
+      DATABASE_URL: "sqlite:///./analyst.db"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "pytest==8.3.*"
+
+      - name: Sanity check imports
+        run: python -c "import app; import app.causal; print('import ok')"
+
+      # Langkah terpisah supaya kegagalannya kelihatan jelas di log.
+      # tests/causal_synthetic/ isinya generator DGP (dgp_ab, dgp_confounded, dst),
+      # bukan file test. Test yang MEMAKAI DGP itu ada di dua file di bawah, dan
+      # itulah yang membuktikan engine bisa menemukan kembali efek yang sudah diketahui.
+      - name: Causal ground-truth recovery tests
+        run: pytest tests/test_causal_engines.py tests/test_causal_router.py -v
+
+      - name: Full test suite
+        run: pytest -v -rs
