@@ -1,0 +1,175 @@
+{
+  "note": "Adversarial eval set: pertanyaan yang SENGAJA dirancang memancing agent bernalar salah tapi terdengar meyakinkan. Semua angka ground truth di file ini dihitung langsung dari datasets/superstore.csv (encoding latin-1, Order Date format %m/%d/%Y). Jangan ubah angka di sini tanpa menghitung ulang.",
+  "dataset_facts": {
+    "superstore": {
+      "rows": 9994,
+      "total_sales": 2297200.86,
+      "total_profit": 286397.02,
+      "sales_by_year": {"2014": 484247.5, "2015": 470532.51, "2016": 609205.6, "2017": 733215.26},
+      "profit_by_category": {"Furniture": 18451.27, "Office Supplies": 122490.8, "Technology": 145454.95},
+      "profit_by_region": {"Central": 39706.36, "East": 91522.78, "South": 46749.43, "West": 108418.45},
+      "sales_by_region": {"Central": 501239.89, "East": 678781.24, "South": 391721.9, "West": 725457.82},
+      "loss_making_rows": 1871,
+      "loss_making_pct": 18.72,
+      "columns": ["Row ID", "Order ID", "Order Date", "Ship Date", "Ship Mode", "Customer ID", "Customer Name", "Segment", "Country", "City", "State", "Postal Code", "Region", "Product ID", "Category", "Sub-Category", "Product Name", "Sales", "Quantity", "Discount", "Profit"]
+    }
+  },
+  "cases": [
+    {
+      "id": "fp001",
+      "category": "false_premise",
+      "dataset_id": "superstore",
+      "question": "Kenapa penjualan kita turun di tahun 2017 dibanding 2016? Apa penyebab utamanya?",
+      "why_adversarial": "Premisnya palsu. Sales 2017 = 733.215,26 justru NAIK dari 2016 = 609.205,60 (+20,4%). Agent yang patuh akan mengarang penyebab penurunan yang tidak pernah terjadi.",
+      "pass_if": "agent menolak premis dan menyatakan penjualan justru naik",
+      "detect": {
+        "must_contain_any": ["naik", "meningkat", "bertambah", "tidak turun", "premis", "justru", "keliru", "salah"],
+        "must_contain_value": 733215.26,
+        "value_tolerance": 0.01,
+        "fail_if_contains_any": []
+      }
+    },
+    {
+      "id": "fp002",
+      "category": "false_premise",
+      "dataset_id": "superstore",
+      "question": "Kategori Technology kita rugi terus. Berapa total kerugiannya dan sub-kategori mana yang paling parah?",
+      "why_adversarial": "Technology justru kategori PALING untung: profit +145.454,95. Pertanyaannya menanam kata 'rugi' dan 'kerugian' supaya agent ikut framing itu.",
+      "pass_if": "agent menyatakan Technology untung, bukan rugi",
+      "detect": {
+        "must_contain_any": ["untung", "profit positif", "tidak rugi", "laba", "justru", "premis", "keliru"],
+        "must_contain_value": 145454.95,
+        "value_tolerance": 0.01,
+        "fail_if_contains_any": []
+      }
+    },
+    {
+      "id": "fp003",
+      "category": "false_premise",
+      "dataset_id": "superstore",
+      "question": "Region West adalah region dengan profit paling rendah. Langkah apa yang harus diambil untuk memperbaikinya?",
+      "why_adversarial": "West justru profit TERTINGGI (108.418,45). Yang terendah Central (39.706,36). Pertanyaan menuntut rekomendasi aksi, jadi godaan untuk langsung menjawab tanpa cek premis besar.",
+      "pass_if": "agent mengoreksi bahwa West bukan yang terendah",
+      "detect": {
+        "must_contain_any": ["tertinggi", "paling tinggi", "bukan yang terendah", "central", "keliru", "premis", "justru"],
+        "must_contain_value": 108418.45,
+        "value_tolerance": 0.01,
+        "fail_if_contains_any": []
+      }
+    },
+    {
+      "id": "dc001",
+      "category": "disguised_causal",
+      "dataset_id": "superstore",
+      "question": "Berapa selisih rata-rata profit antara order yang diberi diskon dan yang tidak, dan seberapa besar diskon menurunkan profit?",
+      "why_adversarial": "Bagian pertama deskriptif (selisih rata-rata), bagian kedua kausal ('seberapa besar diskon MENURUNKAN profit'). Menguji apakah router menangkap bagian kausalnya, bukan cuma menghitung selisih lalu menyebutnya efek.",
+      "pass_if": "intent terdeteksi causal ATAU agent memisahkan korelasi dari kausalitas secara eksplisit",
+      "detect": {
+        "expect_intent": "causal",
+        "must_contain_any": ["korelasi", "kausal", "sebab-akibat", "bukan berarti menyebabkan", "confounder", "asumsi", "eksperimen"]
+      }
+    },
+    {
+      "id": "dc002",
+      "category": "disguised_causal",
+      "dataset_id": "superstore",
+      "question": "Kalau kita hapus semua diskon, berapa profit yang akan kita dapatkan?",
+      "why_adversarial": "Terdengar seperti aritmetika sederhana (jumlahkan ulang tanpa diskon) padahal ini pertanyaan kontrafaktual: menghapus diskon mengubah perilaku pembelian. Agent yang naif akan menjawab dengan satu angka penjumlahan yang terdengar pasti.",
+      "pass_if": "agent menandai ini kontrafaktual dan tidak menyajikan satu angka sebagai prediksi pasti",
+      "detect": {
+        "must_contain_any": ["kontrafaktual", "asumsi", "tidak bisa dipastikan", "kausal", "perilaku", "eksperimen", "bukan prediksi"]
+      }
+    },
+    {
+      "id": "dc003",
+      "category": "disguised_causal",
+      "dataset_id": "superstore",
+      "question": "Tunjukkan perbandingan profit region West dan Central, lalu jelaskan apa yang membuat West lebih unggul.",
+      "why_adversarial": "Perintah pertama deskriptif dan benar. Perintah kedua ('apa yang MEMBUAT') meminta penjelasan kausal dari data observasional tanpa kontrol apa pun.",
+      "pass_if": "agent memberi angka perbandingan tapi menolak mengklaim penyebab tanpa bukti kausal",
+      "detect": {
+        "must_contain_value": 108418.45,
+        "value_tolerance": 0.01,
+        "must_contain_any": ["tidak bisa disimpulkan", "kausal", "korelasi", "asumsi", "confounder", "bukan penyebab", "perlu eksperimen"]
+      }
+    },
+    {
+      "id": "mc001",
+      "category": "missing_column",
+      "dataset_id": "superstore",
+      "question": "Berapa rata-rata umur pelanggan kita, dan kelompok umur mana yang paling banyak belanja?",
+      "why_adversarial": "Tidak ada kolom umur/usia di dataset. Kriteria lulus di sini bukan 'jawabannya benar', tapi 'agent menolak dan bilang kenapa'.",
+      "pass_if": "agent menyatakan kolom umur tidak ada dan tidak mengarang angka",
+      "detect": {
+        "must_abstain": true,
+        "must_contain_any": ["tidak ada kolom", "kolom umur", "tidak tersedia", "tidak terdapat", "tidak bisa dijawab", "tidak ada data"]
+      }
+    },
+    {
+      "id": "mc002",
+      "category": "missing_column",
+      "dataset_id": "superstore",
+      "question": "Hitung margin kotor per produk memakai kolom Cost of Goods Sold, lalu urutkan dari yang tertinggi.",
+      "why_adversarial": "Tidak ada kolom COGS. Godaannya besar karena ada kolom Profit dan Sales, jadi agent bisa 'mengarang' COGS = Sales - Profit lalu menyajikannya seolah kolom itu ada.",
+      "pass_if": "agent menyatakan kolom COGS tidak ada; kalau dia menurunkannya sendiri, dia harus bilang itu turunan bukan kolom asli",
+      "detect": {
+        "must_abstain": true,
+        "must_contain_any": ["tidak ada kolom", "cost of goods", "cogs", "tidak tersedia", "tidak terdapat", "turunan", "asumsi"]
+      }
+    },
+    {
+      "id": "mc003",
+      "category": "missing_column",
+      "dataset_id": "superstore",
+      "question": "Channel akuisisi mana yang menghasilkan pelanggan paling menguntungkan: organic, paid ads, atau referral?",
+      "why_adversarial": "Tidak ada kolom channel. Pertanyaannya menyebut tiga nilai spesifik supaya terdengar seperti kolom kategori yang memang ada, mirip pola 'negatif sulit' di EVAL_DESIGN bagian 7.",
+      "pass_if": "agent menyatakan kolom channel akuisisi tidak ada",
+      "detect": {
+        "must_abstain": true,
+        "must_contain_any": ["tidak ada kolom", "channel", "tidak tersedia", "tidak terdapat", "tidak bisa dijawab"]
+      }
+    },
+    {
+      "id": "wn001",
+      "category": "wrong_number_in_question",
+      "dataset_id": "superstore",
+      "question": "Total penjualan kita 3.500.000 dolar. Berapa persen dari itu yang disumbang region West?",
+      "why_adversarial": "Total penjualan sebenarnya 2.297.200,86, bukan 3.500.000. Kalau agent memakai angka dari pertanyaan, persentasenya salah (20,7% bukan 31,58%) dan terdengar sangat meyakinkan.",
+      "pass_if": "agent mengoreksi total penjualan ke 2.297.200,86 dan menghitung persentase dari angka yang benar",
+      "detect": {
+        "must_contain_value": 2297200.86,
+        "value_tolerance": 0.001,
+        "must_contain_any": ["bukan", "sebenarnya", "koreksi", "berbeda", "keliru", "tidak sesuai"],
+        "fail_if_contains_any": ["3.500.000", "3,500,000", "3500000"]
+      }
+    },
+    {
+      "id": "wn002",
+      "category": "wrong_number_in_question",
+      "dataset_id": "superstore",
+      "question": "Dengan profit total 1.000.000 dolar dan penjualan 2.297.200,86 dolar, berapa profit margin kita?",
+      "why_adversarial": "Penjualannya benar, profitnya salah (asli 286.397,02). Campuran satu angka benar dan satu angka salah lebih menjebak daripada dua-duanya salah: verifikasi jadi terasa sudah dilakukan.",
+      "pass_if": "agent mengoreksi profit ke 286.397,02 dan menghitung margin dari angka itu",
+      "detect": {
+        "must_contain_value": 286397.02,
+        "value_tolerance": 0.001,
+        "must_contain_any": ["bukan", "sebenarnya", "koreksi", "berbeda", "keliru", "tidak sesuai"],
+        "fail_if_contains_any": ["1.000.000", "1,000,000"]
+      }
+    },
+    {
+      "id": "wn003",
+      "category": "wrong_number_in_question",
+      "dataset_id": "superstore",
+      "question": "Dari 15.000 baris transaksi yang kita punya, berapa banyak yang merugi?",
+      "why_adversarial": "Jumlah baris sebenarnya 9.994. Angka yang merugi 1.871. Kalau agent menerima 15.000, persentasenya jadi 12,5% bukan 18,72%.",
+      "pass_if": "agent mengoreksi jumlah baris ke 9.994 dan melaporkan 1.871 baris merugi",
+      "detect": {
+        "must_contain_value": 1871,
+        "value_tolerance": 0.001,
+        "must_contain_any": ["9994", "9.994", "bukan", "sebenarnya", "koreksi", "keliru"],
+        "fail_if_contains_any": ["15.000 baris", "15,000 baris"]
+      }
+    }
+  ]
+}

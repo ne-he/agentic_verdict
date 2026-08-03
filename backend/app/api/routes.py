@@ -1,9 +1,11 @@
 """Endpoint API ANALYST (FASE 4 / T4.1).
 
-- POST /analyze         → stream SSEEvent (plan → step → tool → chart → verify → confidence → final)
-- GET  /run/{run_id}    → hasil run historis dari DB
-- GET  /eval/dashboard  → metrik agregat + run terbaru (failure dashboard)
-- GET  /datasets        → daftar dataset tersedia
+- POST /analyze             → stream SSEEvent (plan → step → tool → chart → verify → confidence → final)
+- GET  /run/{run_id}        → hasil run historis dari DB
+- POST /runs/{run_id}/resume→ lanjutkan run yang mati di tengah, dari checkpoint terakhir
+- GET  /runs/resumable      → daftar run yang state-nya masih "running" (kandidat resume)
+- GET  /eval/dashboard      → metrik agregat + run terbaru (failure dashboard)
+- GET  /datasets            → daftar dataset tersedia
 
 Catatan SSE: ReactLoop.run() sinkron & memancarkan event lewat callback `on_event`.
 Loop dijalankan di thread terpisah; event masuk ke Queue lalu di-yield sebagai SSE.
@@ -16,12 +18,12 @@ import asyncio
 import json
 import queue
 import threading
-from typing import AsyncIterator
+from typing import AsyncIterator, Callable
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 
-from app.agent.react_loop import ReactLoop
+from app.agent.react_loop import ReactLoop, RunNotResumable
 from app.api.deps import get_react_loop
 from app.core.datasets import DATASET_CATALOG, list_datasets
 from app.sandbox.runner import ARTIFACTS_ROOT
@@ -30,6 +32,7 @@ from app.core.schemas import (
     AnalyzeRequest,
     DatasetInfo,
     EvalDashboard,
+    ResumableRun,
     RunRecord,
     SSEEvent,
 )
@@ -46,17 +49,15 @@ def _sse(event: SSEEvent) -> str:
     return f"event: {event.type}\ndata: {payload}\n\n"
 
 
-@router.post("/analyze")
-async def analyze(
-    req: AnalyzeRequest,
-    loop: ReactLoop = Depends(get_react_loop),
-) -> StreamingResponse:
-    """Jalankan analisis dan stream tiap event ke client (SSE)."""
-    if req.dataset_id not in list_datasets():
-        raise HTTPException(
-            status_code=404,
-            detail=f"dataset '{req.dataset_id}' tidak dikenal. Tersedia: {list_datasets()}",
-        )
+def _run_stream(
+    work: Callable[[Callable[[SSEEvent], None]], AnalysisResult],
+    question: str,
+) -> AsyncIterator[str]:
+    """Jalankan `work` di thread terpisah, stream event-nya sebagai SSE, lalu persist.
+
+    Dipakai dua endpoint: /analyze (run baru) dan /runs/{id}/resume (lanjutan run
+    yang mati). Bedanya cuma callable `work`-nya.
+    """
 
     async def event_stream() -> AsyncIterator[str]:
         events: queue.Queue = queue.Queue()
@@ -67,12 +68,7 @@ async def analyze(
 
         def worker() -> None:
             try:
-                holder["result"] = loop.run(
-                    req.question,
-                    req.dataset_id,
-                    on_event=on_event,
-                    causal_roles=req.causal_roles,
-                )
+                holder["result"] = work(on_event)
             except Exception as exc:  # noqa: BLE001 - sampaikan ke client sbg event error
                 holder["error"] = exc
             finally:
@@ -100,11 +96,73 @@ async def analyze(
         result = holder.get("result")
         if isinstance(result, AnalysisResult):
             try:
-                repository.save_run(result, question=req.question)
+                repository.save_run(result, question=question)
             except Exception:  # noqa: BLE001 - gagal simpan tak boleh merusak stream
                 pass
 
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+    return event_stream()
+
+
+@router.post("/analyze")
+async def analyze(
+    req: AnalyzeRequest,
+    loop: ReactLoop = Depends(get_react_loop),
+) -> StreamingResponse:
+    """Jalankan analisis dan stream tiap event ke client (SSE)."""
+    if req.dataset_id not in list_datasets():
+        raise HTTPException(
+            status_code=404,
+            detail=f"dataset '{req.dataset_id}' tidak dikenal. Tersedia: {list_datasets()}",
+        )
+
+    def work(on_event: Callable[[SSEEvent], None]) -> AnalysisResult:
+        return loop.run(
+            req.question,
+            req.dataset_id,
+            on_event=on_event,
+            causal_roles=req.causal_roles,
+        )
+
+    return StreamingResponse(_run_stream(work, req.question), media_type="text/event-stream")
+
+
+@router.post("/runs/{run_id}/resume")
+async def resume_run(
+    run_id: str,
+    loop: ReactLoop = Depends(get_react_loop),
+) -> StreamingResponse:
+    """Lanjutkan run yang mati di tengah, dari langkah terakhir yang tersimpan.
+
+    404 kalau run_id tidak ada di checkpoint. 409 kalau run-nya sudah selesai
+    (tidak ada yang perlu dilanjutkan). Sukses → stream SSE persis seperti /analyze,
+    diawali event `step` bertanda "resume" supaya UI tahu ini lanjutan.
+    """
+    state = repository.get_run_state(run_id)
+    if state is None:
+        raise HTTPException(
+            status_code=404, detail=f"run '{run_id}' tidak ada di checkpoint"
+        )
+    if state["status"] != "running":
+        raise HTTPException(
+            status_code=409,
+            detail=f"run '{run_id}' statusnya '{state['status']}', tidak perlu di-resume",
+        )
+
+    def work(on_event: Callable[[SSEEvent], None]) -> AnalysisResult:
+        try:
+            return loop.resume(run_id, on_event=on_event)
+        except RunNotResumable as exc:
+            raise RuntimeError(str(exc)) from exc
+
+    return StreamingResponse(
+        _run_stream(work, state["question"]), media_type="text/event-stream"
+    )
+
+
+@router.get("/runs/resumable", response_model=list[ResumableRun])
+async def resumable_runs(limit: int = 50) -> list[ResumableRun]:
+    """Run yang state-nya masih 'running', biasanya sisa proses yang mati di tengah."""
+    return [ResumableRun(**row) for row in repository.list_resumable_runs(limit=limit)]
 
 
 @router.get("/runs", response_model=list[RunRecord])

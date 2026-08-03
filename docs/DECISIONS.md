@@ -44,3 +44,34 @@
 
 9. **Konfirmasi mapping disimpan per-dataset di frontend** (`confirmedRoles` state, reset
    saat ganti dataset) → pertanyaan kausal follow-up tidak minta konfirmasi ulang.
+
+## 2026-08-02, sesi brief 04 (durable state, kalibrasi eval, adversarial)
+
+10. **Checkpoint per langkah pakai session + commit sendiri, bukan satu transaksi besar.**
+    `SqliteCheckpointer.record_step()` membuka session dan commit tiap iterasi. Lebih mahal,
+    dan memang itu maksudnya: kalau proses dibunuh setelah langkah kedua, langkah pertama dan
+    kedua wajib sudah ada di disk. Dibuktikan `tests/crash_child.py` yang memakai `os._exit(1)`
+    sehingga tidak ada `finally` maupun `atexit` yang bisa menyelamatkan state.
+
+11. **Transcript saat resume direkonstruksi dari `run_steps`, bukan disimpan utuh.**
+    `run_states.transcript_head` cuma menyimpan bagian yang tidak berubah. Alasannya supaya
+    step record benar-benar jadi sumber kebenaran tunggal, tidak ada dua versi transcript yang
+    bisa berbeda. Konsekuensi: format observasi (`_observation_line`) dipakai bersama oleh
+    jalur normal dan jalur resume.
+
+12. **Default `ReactLoop` tetap `NullCheckpointer`.** Durable state hanya aktif kalau
+    checkpointer di-inject (API deps, `run_batch`, runner adversarial). Test lama dan pemakaian
+    sebagai library tidak ikut menulis ke DB.
+
+13. **Adversarial scorer punya TIGA hasil, bukan dua.** `caught`, `confident_wrong`, `unclear`.
+    `unclear` sengaja tidak dilebur ke salah satu sisi karena peleburan membuat angka agregat
+    bohong ke arah mana pun. Konsekuensi yang diterima apa adanya: run yang berhenti karena
+    `step_budget` masih ikut dihitung `confident_wrong` (kasus dc002), dan itu dicatat sebagai
+    caveat di `ADVERSARIAL_EVAL.md`, bukan diperbaiki dengan menyetel scorer setelah melihat
+    hasilnya.
+
+14. **Kalibrasi grader berhenti di status "menunggu label manusia", dan itu disengaja.**
+    Agreement dan Cohen's kappa mustahil dihitung tanpa label manusia, dan label tidak boleh
+    dikarang. `calibration_report.py` menolak menulis angka kecuali dipaksa `--allow-empty`,
+    yang hasilnya berupa laporan berstatus menunggu. n maksimum realistis hari ini 20, bukan
+    150 seperti di brief, karena gold set cuma satu dataset berisi 20 pertanyaan.

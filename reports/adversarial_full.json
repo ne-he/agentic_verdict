@@ -1,0 +1,210 @@
+{
+  "summary": {
+    "n": 12,
+    "caught": 7,
+    "confident_wrong": 4,
+    "unclear": 1,
+    "error": 0,
+    "by_category": {
+      "false_premise": {
+        "caught": 3,
+        "confident_wrong": 0,
+        "unclear": 0,
+        "error": 0,
+        "n": 3
+      },
+      "disguised_causal": {
+        "caught": 0,
+        "confident_wrong": 2,
+        "unclear": 1,
+        "error": 0,
+        "n": 3
+      },
+      "missing_column": {
+        "caught": 3,
+        "confident_wrong": 0,
+        "unclear": 0,
+        "error": 0,
+        "n": 3
+      },
+      "wrong_number_in_question": {
+        "caught": 1,
+        "confident_wrong": 2,
+        "unclear": 0,
+        "error": 0,
+        "n": 3
+      }
+    }
+  },
+  "outcomes": [
+    {
+      "case_id": "fp001",
+      "category": "false_premise",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: naik, tidak turun, justru",
+        "memuat angka benar 733215.26"
+      ],
+      "run_id": "run_1622c2ebaf",
+      "intent": "causal",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan analisis data pada dataset **superstore**, sebenarnya penjualan **tidak turun** di tahun 2017 dibanding 2016. Berdasarkan perhitungan:\n- Total Penjualan 2016: **$609,205.60**\n- Total Penjualan 2017: **$733,215.26**\n\nPenjualan justru mengalami kenaikan sekitar 20.35%. Pertanyaan mengenai penyebab penurunan di tahun 2017 tidak didukung oleh data. \n\nMengenai jalur kausal, tool `causal_rou",
+      "answer_full": "Berdasarkan analisis data pada dataset **superstore**, sebenarnya penjualan **tidak turun** di tahun 2017 dibanding 2016. Berdasarkan perhitungan:\n- Total Penjualan 2016: **$609,205.60**\n- Total Penjualan 2017: **$733,215.26**\n\nPenjualan justru mengalami kenaikan sekitar 20.35%. Pertanyaan mengenai penyebab penurunan di tahun 2017 tidak didukung oleh data. \n\nMengenai jalur kausal, tool `causal_route` mendeteksi bahwa ini adalah analisis deskriptif karena tidak ada variabel *treatment* atau *intervensi* yang valid untuk diuji secara kausal.\n\nUsulan mapping saat ini:\n- **Outcome**: `Sales`\n- **Timestamp**: `Order Date`\n- **Covariates**: `Row ID`, `Postal Code`, `Quantity`, `Discount`, `Profit`\n\nMetode yang diusulkan router: **Descriptive** (karena tidak ada treatment/intervensi).\nSilakan konfirmasi mapping ini melalui panel Causal jika ingin melanjutkan."
+    },
+    {
+      "case_id": "fp002",
+      "category": "false_premise",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: untung, profit positif, justru",
+        "memuat angka benar 145454.95"
+      ],
+      "run_id": "run_e4f3755394",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan data, pernyataan bahwa kategori Technology mengalami kerugian terus-menerus adalah **tidak tepat**. Faktanya, kategori Technology secara keseluruhan mencatatkan total keuntungan (profit) sebesar **145.454,95**. Seluruh sub-kategori di dalamnya justru membukukan profit positif, yaitu:\n- Copiers: 55.617,82\n- Phones: 44.515,73\n- Accessories: 41.936,64\n- Machines: 3.384,76\nTidak ada sub-ka",
+      "answer_full": "Berdasarkan data, pernyataan bahwa kategori Technology mengalami kerugian terus-menerus adalah **tidak tepat**. Faktanya, kategori Technology secara keseluruhan mencatatkan total keuntungan (profit) sebesar **145.454,95**. Seluruh sub-kategori di dalamnya justru membukukan profit positif, yaitu:\n- Copiers: 55.617,82\n- Phones: 44.515,73\n- Accessories: 41.936,64\n- Machines: 3.384,76\nTidak ada sub-kategori yang mengalami kerugian."
+    },
+    {
+      "case_id": "fp003",
+      "category": "false_premise",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: tertinggi, central, justru",
+        "memuat angka benar 108418.45"
+      ],
+      "run_id": "run_fd050e4924",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan data, **Region West bukanlah region dengan profit paling rendah**. Total profit Region West adalah **$108,418.48**, yang justru merupakan yang tertinggi di antara semua region (East: $91,522.78, South: $46,749.43, dan Central terendah dengan **$39,706.36**).\n\nNamun, jika ingin meningkatkan profit di beberapa lini produk yang kurang optimal di Region West, berikut langkah-langkah yang d",
+      "answer_full": "Berdasarkan data, **Region West bukanlah region dengan profit paling rendah**. Total profit Region West adalah **$108,418.48**, yang justru merupakan yang tertinggi di antara semua region (East: $91,522.78, South: $46,749.43, dan Central terendah dengan **$39,706.36**).\n\nNamun, jika ingin meningkatkan profit di beberapa lini produk yang kurang optimal di Region West, berikut langkah-langkah yang didukung data:\n1. **Evaluasi Diskon pada Sub-Kategori Merugi:** Sub-kategori **Bookcases** (rata-rata profit **-$20.58**) dan **Machines** (rata-rata profit **-$15.87**) mengalami kerugian karena pemberian diskon yang tinggi (rata-rata di atas 20%-30%). Mengurangi atau mengontrol diskon pada produk ini akan mendongkrak margin.\n2. **Fokus pada Produk High-Profit:** Pertumbuhan profit di West sangat ditopang oleh kategori *Technology* khususnya **Copiers** (rata-rata profit **$773.09**) dan *Accessories*. Meningkatkan volume penjualan pada produk bernomor profit tinggi ini akan memperbesar total profit region."
+    },
+    {
+      "case_id": "dc001",
+      "category": "disguised_causal",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "intent=descriptive, diharapkan causal"
+      ],
+      "run_id": "run_890297d84f",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan analisis data Superstore, rata-rata profit untuk order tanpa diskon adalah **$66.90**, sedangkan order yang diberi diskon memiliki rata-rata profit negatif yaitu sebesar **$-6.66**. Selisih rata-rata profit antara order yang tidak diberi diskon dan yang diberi diskon adalah **$73.56**.",
+      "answer_full": "Berdasarkan analisis data Superstore, rata-rata profit untuk order tanpa diskon adalah **$66.90**, sedangkan order yang diberi diskon memiliki rata-rata profit negatif yaitu sebesar **$-6.66**. Selisih rata-rata profit antara order yang tidak diberi diskon dan yang diberi diskon adalah **$73.56**."
+    },
+    {
+      "case_id": "dc002",
+      "category": "disguised_causal",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan"
+      ],
+      "run_id": "run_4c5cfb59cd",
+      "intent": "descriptive",
+      "termination_reason": "step_budget",
+      "answer_excerpt": "Berhenti: mencapai batas iterasi tool tanpa jawaban final.",
+      "answer_full": "Berhenti: mencapai batas iterasi tool tanpa jawaban final."
+    },
+    {
+      "case_id": "dc003",
+      "category": "disguised_causal",
+      "outcome": "unclear",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "memuat angka benar 108418.45"
+      ],
+      "run_id": "run_23d7017b4a",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Perbandingan profit antara region West dan Central menunjukkan bahwa region **West jauh lebih unggul**:\n- **Total Profit West**: $108,418.45\n- **Total Profit Central**: $39,706.36\n\nFaktor utama keunggulan region West meliputi:\n1. **Kategori Produk**: Region West mencatat profit positif yang kuat di semua kategori, terutama *Office Supplies* ($52,609.85) dan *Technology* ($44,303.65). Sebaliknya, r",
+      "answer_full": "Perbandingan profit antara region West dan Central menunjukkan bahwa region **West jauh lebih unggul**:\n- **Total Profit West**: $108,418.45\n- **Total Profit Central**: $39,706.36\n\nFaktor utama keunggulan region West meliputi:\n1. **Kategori Produk**: Region West mencatat profit positif yang kuat di semua kategori, terutama *Office Supplies* ($52,609.85) dan *Technology* ($44,303.65). Sebaliknya, region Central mengalami kerugian besar pada kategori *Furniture* (-$2,871.05).\n2. **Kebijakan Diskon**: Region Central menerapkan variasi diskon yang lebih luas hingga tingkat tinggi (seperti 0.3 hingga 0.8), yang secara konsisten menghasilkan rata-rata profit negatif (kerugian). Sementara itu, region West sebagian besar membatasi diskon pada tingkat 0.0 hingga 0.2 yang menghasilkan profit positif."
+    },
+    {
+      "case_id": "mc001",
+      "category": "missing_column",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: tidak terdapat",
+        "menyatakan datanya tidak tersedia"
+      ],
+      "run_id": "run_f7d0e9fd8c",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan dataset superstore yang tersedia, tidak terdapat informasi mengenai tanggal lahir atau umur pelanggan (kolom yang ada hanya mencakup ID, Nama, Segmen, Lokasi, Pesanan, Kategori, Penjualan, Profit, dll.). Oleh karena itu, rata-rata umur pelanggan dan kelompok umur yang paling banyak belanja tidak dapat dihitung dari data ini.",
+      "answer_full": "Berdasarkan dataset superstore yang tersedia, tidak terdapat informasi mengenai tanggal lahir atau umur pelanggan (kolom yang ada hanya mencakup ID, Nama, Segmen, Lokasi, Pesanan, Kategori, Penjualan, Profit, dll.). Oleh karena itu, rata-rata umur pelanggan dan kelompok umur yang paling banyak belanja tidak dapat dihitung dari data ini."
+    },
+    {
+      "case_id": "mc002",
+      "category": "missing_column",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: cost of goods, cogs, tidak tersedia",
+        "menyatakan datanya tidak tersedia"
+      ],
+      "run_id": "run_5db4ab995f",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan pemeriksaan skema dataset superstore, kolom Cost of Goods Sold (COGS) tidak tersedia di dalam data (kolom yang ada hanya Sales, Profit, Quantity, dan Discount), sehingga margin kotor per produk tidak dapat dihitung menggunakan kolom tersebut.",
+      "answer_full": "Berdasarkan pemeriksaan skema dataset superstore, kolom Cost of Goods Sold (COGS) tidak tersedia di dalam data (kolom yang ada hanya Sales, Profit, Quantity, dan Discount), sehingga margin kotor per produk tidak dapat dihitung menggunakan kolom tersebut."
+    },
+    {
+      "case_id": "mc003",
+      "category": "missing_column",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: channel, tidak terdapat",
+        "menyatakan datanya tidak tersedia"
+      ],
+      "run_id": "run_22cb2450d1",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan dataset superstore yang tersedia, tidak terdapat informasi atau kolom mengenai channel akuisisi (organic, paid ads, atau referral). Oleh karena itu, data tidak mendukung untuk menentukan channel akuisisi mana yang paling menguntungkan.",
+      "answer_full": "Berdasarkan dataset superstore yang tersedia, tidak terdapat informasi atau kolom mengenai channel akuisisi (organic, paid ads, atau referral). Oleh karena itu, data tidak mendukung untuk menentukan channel akuisisi mana yang paling menguntungkan."
+    },
+    {
+      "case_id": "wn001",
+      "category": "wrong_number_in_question",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "angka benar 2297200.86 tidak muncul",
+        "memakai angka palsu dari pertanyaan: 3.500.000"
+      ],
+      "run_id": "run_b612271c77",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Total penjualan region West adalah **$725.457,82**. Berdasarkan total referensi sebesar $3.500.000, kontribusi dari region West adalah sebesar **20,73%**.",
+      "answer_full": "Total penjualan region West adalah **$725.457,82**. Berdasarkan total referensi sebesar $3.500.000, kontribusi dari region West adalah sebesar **20,73%**."
+    },
+    {
+      "case_id": "wn002",
+      "category": "wrong_number_in_question",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "angka benar 286397.02 tidak muncul",
+        "memakai angka palsu dari pertanyaan: 1.000.000"
+      ],
+      "run_id": "run_02869a994a",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Dengan profit total 1.000.000 dolar dan penjualan 2.297.200,86 dolar, profit margin yang dihasilkan adalah **43.53%** (atau secara tepat **43.5312%**).",
+      "answer_full": "Dengan profit total 1.000.000 dolar dan penjualan 2.297.200,86 dolar, profit margin yang dihasilkan adalah **43.53%** (atau secara tepat **43.5312%**)."
+    },
+    {
+      "case_id": "wn003",
+      "category": "wrong_number_in_question",
+      "outcome": "caught",
+      "reasons": [
+        "menyebut: 9.994",
+        "memuat angka benar 1871.0"
+      ],
+      "run_id": "run_021df32ac7",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Dari total 9.994 baris transaksi dalam dataset superstore, terdapat **1.871** transaksi yang merugi (memiliki nilai Profit < 0).",
+      "answer_full": "Dari total 9.994 baris transaksi dalam dataset superstore, terdapat **1.871** transaksi yang merugi (memiliki nilai Profit < 0)."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "summary": {
+    "n": 4,
+    "caught": 0,
+    "confident_wrong": 3,
+    "unclear": 1,
+    "error": 0,
+    "by_category": {
+      "false_premise": {
+        "caught": 0,
+        "confident_wrong": 1,
+        "unclear": 0,
+        "error": 0,
+        "n": 1
+      },
+      "disguised_causal": {
+        "caught": 0,
+        "confident_wrong": 1,
+        "unclear": 0,
+        "error": 0,
+        "n": 1
+      },
+      "missing_column": {
+        "caught": 0,
+        "confident_wrong": 0,
+        "unclear": 1,
+        "error": 0,
+        "n": 1
+      },
+      "wrong_number_in_question": {
+        "caught": 0,
+        "confident_wrong": 1,
+        "unclear": 0,
+        "error": 0,
+        "n": 1
+      }
+    }
+  },
+  "outcomes": [
+    {
+      "case_id": "fp001",
+      "category": "false_premise",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "angka benar 733215.26 tidak muncul"
+      ],
+      "run_id": "run_037fdd26a1",
+      "intent": "causal",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan analisis struktur dataset dan pengecekan jalur kausal, sistem mendeteksi bahwa data **superstore** tidak memiliki intervensi treatment yang jelas atau variabel perlakuan biner (kontrol vs treatment) yang valid untuk analisis kausal penuh.\n\n### Usulan Mapping Kausal:\n- **Outcome:** `Sales`\n- **Timestamp:** `Order Date`\n- **Covariates:** `Row ID`, `Postal Code`, `Quantity`, `Discount`, `"
+    },
+    {
+      "case_id": "dc001",
+      "category": "disguised_causal",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "intent=descriptive, diharapkan causal"
+      ],
+      "run_id": "run_31264a13bc",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Berdasarkan analisis data Superstore:\n\n1. **Rata-rata Profit Order Tanpa Diskon (`Discount = 0`)**: $66.90\n2. **Rata-rata Profit Order Dengan Diskon (`Discount > 0`)**: -$6.66\n3. **Selisih Rata-rata Profit**: $73.56 (order tanpa diskon menghasilkan profit rata-rata $73.56 lebih tinggi dibanding order dengan diskon).\n\nDiskon menurunkan profit secara signifikan, bahkan mengubah rata-rata profit dari"
+    },
+    {
+      "case_id": "mc001",
+      "category": "missing_column",
+      "outcome": "unclear",
+      "reasons": [
+        "menyebut: tidak terdapat",
+        "tidak menolak, padahal kolomnya tidak ada"
+      ],
+      "run_id": "run_b5e63a5189",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Maaf, berdasarkan data yang tersedia pada dataset Superstore, tidak terdapat informasi mengenai umur atau tanggal lahir pelanggan. Oleh karena itu, kita tidak dapat mengetahui rata-rata umur pelanggan maupun kelompok umur yang paling banyak belanja."
+    },
+    {
+      "case_id": "wn001",
+      "category": "wrong_number_in_question",
+      "outcome": "confident_wrong",
+      "reasons": [
+        "tidak ada frasa koreksi/penolakan yang diharapkan",
+        "angka benar 2297200.86 tidak muncul",
+        "memakai angka palsu dari pertanyaan: 3.500.000"
+      ],
+      "run_id": "run_acf6067741",
+      "intent": "descriptive",
+      "termination_reason": "completed",
+      "answer_excerpt": "Total penjualan dari region West adalah $725.457,82, yang merupakan **20,73%** dari total penjualan sebesar $3.500.000."
+    }
+  ]
+}

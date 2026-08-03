@@ -5,6 +5,8 @@ Tabel:
   - scorecards    : penilaian eval per run
   - gold_questions: pertanyaan gold set yang tersimpan (optional, untuk dashboard)
   - artifacts     : path file hasil (chart PNG, dsb)
+  - run_states    : durable state satu run agent (header) supaya bisa di-resume
+  - run_steps     : satu baris per iterasi loop agent (durable state per langkah)
 
 Tidak ada tipe kolom SQLite-only — semua standar SQLAlchemy supaya portable ke Postgres.
 """
@@ -40,6 +42,11 @@ class RunHistory(Base):
     tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     cost_usd: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     duration_ms: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # Alasan run berhenti: completed | step_budget | token_budget | timeout |
+    # tool_error | cancelled | crashed (lihat app/agent/termination.py).
+    termination_reason: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="completed"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=_utcnow
     )
@@ -87,6 +94,66 @@ class GoldQuestionRow(Base):
     expected_value: Mapped[float] = mapped_column(Float, nullable=False)
     allowed_tolerance: Mapped[float] = mapped_column(Float, nullable=False, default=0.01)
     is_trap: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+
+class RunStateRow(Base):
+    """Durable state satu run agent: header yang cukup untuk melanjutkan run.
+
+    Ditulis SEBELUM loop mulai (status="running") lalu di-update tiap langkah.
+    Kalau proses mati mendadak, baris ini tetap ada dengan status="running".
+    Itulah penanda run yang bisa di-resume lewat POST /runs/{run_id}/resume.
+
+    `transcript_head` = bagian transcript yang tidak berubah (system prompt +
+    catatan kausal + pertanyaan + rencana). Bagian dinamisnya (aksi + observasi)
+    TIDAK disimpan di sini, melainkan direkonstruksi dari tabel run_steps, supaya
+    step record benar-benar jadi sumber kebenaran saat resume.
+    """
+
+    __tablename__ = "run_states"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    dataset_id: Mapped[str] = mapped_column(String(128), nullable=False)
+    causal_roles_json: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    intent: Mapped[str] = mapped_column(String(16), nullable=False, default="descriptive")
+    intent_json: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    plan_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    transcript_head: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    elapsed_ms: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # running | completed | failed
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="running", index=True)
+    termination_reason: Mapped[str] = mapped_column(String(32), nullable=False, default="")
+    resume_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=_utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=_utcnow, onupdate=_utcnow
+    )
+
+
+class RunStepRow(Base):
+    """Satu iterasi loop agent, durable state per langkah (bukan cuma hasil akhir).
+
+    kind:
+      - "tool"             : tool dipanggil; tool/input_json/output_text/error terisi
+      - "invalid_response" : model membalas non-JSON; output_text = teks observasi koreksi
+      - "unknown_tool"     : model minta tool yang tidak ada; output_text = teks observasi
+    """
+
+    __tablename__ = "run_steps"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    step_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    kind: Mapped[str] = mapped_column(String(24), nullable=False, default="tool")
+    tool: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    input_json: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    output_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    error: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    chart_paths_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    tokens_after: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=_utcnow)
 
 
 class Artifact(Base):

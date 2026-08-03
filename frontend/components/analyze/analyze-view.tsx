@@ -14,7 +14,12 @@ import type {
   VerificationResult,
 } from "@/lib/types";
 import { listDatasets, streamAnalyze } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import {
+  cn,
+  terminationColorClass,
+  terminationIsIncomplete,
+  terminationLabel,
+} from "@/lib/utils";
 import { ConfidenceBadge } from "./confidence-badge";
 import { ExecutionTrace, type TraceNode, toolLabel } from "./execution-trace";
 import { WorkspaceTabs, type TabKey } from "./workspace-tabs";
@@ -344,7 +349,25 @@ export function AnalyzeView() {
           <span>{result ? `${result.tokens} tok` : "— tok"}</span>
           <span className="text-[#2a2a2a]">|</span>
           <span>{currentDataset?.dataset_id ?? "—"}</span>
+          {result && (
+            <>
+              <span className="text-[#2a2a2a]">|</span>
+              <span
+                title="Alasan run berhenti"
+                className={cn(terminationColorClass(result.termination_reason))}
+              >
+                {terminationLabel(result.termination_reason)}
+              </span>
+            </>
+          )}
         </div>
+
+        {result && terminationIsIncomplete(result.termination_reason) && (
+          <div className="border-b border-line bg-warn/10 px-[22px] py-[10px] font-mono text-[11.5px] text-warn">
+            Run ini tidak selesai normal ({terminationLabel(result.termination_reason)}). Jawaban di
+            bawah kemungkinan belum tuntas.
+          </div>
+        )}
 
         <div className="flex flex-wrap items-start justify-between gap-6 border-b border-line px-[22px] py-4">
           <div className="min-w-0 flex-1">

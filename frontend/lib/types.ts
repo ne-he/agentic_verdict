@@ -7,6 +7,15 @@
 export type StepStatus = "pending" | "running" | "done" | "error";
 export type ConfidenceLabel = "HIGH" | "MEDIUM" | "LOW";
 export type Intent = "descriptive" | "causal";
+/** Alasan run agent berhenti (mirror app/agent/termination.py). */
+export type TerminationReason =
+  | "completed"
+  | "step_budget"
+  | "token_budget"
+  | "timeout"
+  | "tool_error"
+  | "cancelled"
+  | "crashed";
 export type SSEEventType =
   | "plan"
   | "intent"
@@ -170,6 +179,8 @@ export interface AnalysisResult {
   causal: CausalResult | null;
   causal_confidence: CausalConfidenceBreakdown | null;
   answer_grounded: boolean;
+  /** Kenapa run berhenti. Selain "completed" = jawaban mungkin belum tuntas. */
+  termination_reason: TerminationReason;
 }
 
 export interface SSEEvent {
@@ -208,8 +219,18 @@ export interface RunRecord {
   tokens: number;
   cost_usd: number;
   duration_ms: number;
+  termination_reason: TerminationReason;
   chart_paths: string[];
   created_at: string | null;
+}
+
+/** Run yang state-nya masih "running" di checkpoint, kandidat resume setelah crash. */
+export interface ResumableRun {
+  run_id: string;
+  question: string;
+  dataset_id: string;
+  intent: Intent;
+  updated_at: string | null;
 }
 
 export interface DatasetInfo {

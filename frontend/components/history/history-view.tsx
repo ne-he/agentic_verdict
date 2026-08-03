@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { RunRecord } from "@/lib/types";
 import { listRuns } from "@/lib/api";
-import { cn, fmtUsd } from "@/lib/utils";
+import { cn, fmtUsd, terminationColorClass, terminationLabel } from "@/lib/utils";
 
 export function HistoryView() {
   const [runs, setRuns] = useState<RunRecord[]>([]);
@@ -45,8 +45,8 @@ export function HistoryView() {
           </div>
         </div>
         <p className="mb-[22px] text-[13px] leading-[1.6] text-faint">
-          Tiap analisis tersimpan dengan dataset, computed confidence, dan kode-nya.
-          Run terbaru muncul paling atas.
+          Tiap analisis tersimpan dengan dataset, computed confidence, kode-nya, dan alasan
+          run itu berhenti. Run terbaru muncul paling atas.
         </p>
 
         {error && (
@@ -56,11 +56,12 @@ export function HistoryView() {
         )}
 
         <div className="border border-line">
-          <div className="grid grid-cols-[110px_1fr_110px_90px_130px] gap-2 border-b border-line bg-panel px-[18px] py-[9px] font-mono text-[10px] uppercase tracking-[0.08em] text-faint">
+          <div className="grid grid-cols-[110px_1fr_110px_90px_150px_130px] gap-2 border-b border-line bg-panel px-[18px] py-[9px] font-mono text-[10px] uppercase tracking-[0.08em] text-faint">
             <span>Run</span>
             <span>Question</span>
             <span>Dataset</span>
             <span>Cost</span>
+            <span>Terminasi</span>
             <span className="text-right">Date</span>
           </div>
           {filtered.length === 0 && (
@@ -73,7 +74,7 @@ export function HistoryView() {
           {filtered.map((r) => (
             <div
               key={r.run_id}
-              className="grid grid-cols-[110px_1fr_110px_90px_130px] items-center gap-2 border-b border-line/60 px-[18px] py-[11px] last:border-b-0 hover:bg-panel/40"
+              className="grid grid-cols-[110px_1fr_110px_90px_150px_130px] items-center gap-2 border-b border-line/60 px-[18px] py-[11px] last:border-b-0 hover:bg-panel/40"
             >
               <span className="truncate font-mono text-[11px] text-accent">
                 {r.run_id.replace("run_", "")}
@@ -81,6 +82,14 @@ export function HistoryView() {
               <span className="truncate pr-4 text-[13px] text-ink">{r.question}</span>
               <span className="text-[12px] text-muted">{r.dataset_id}</span>
               <span className="font-mono text-[11.5px] text-muted">{fmtUsd(r.cost_usd)}</span>
+              <span
+                className={cn(
+                  "truncate font-mono text-[11px]",
+                  terminationColorClass(r.termination_reason),
+                )}
+              >
+                {terminationLabel(r.termination_reason)}
+              </span>
               <span className={cn("text-right font-mono text-[11px] text-faint")}>
                 {r.created_at ? new Date(r.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
               </span>

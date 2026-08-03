@@ -15,6 +15,11 @@ from pydantic import BaseModel, Field
 StepStatus = Literal["pending", "running", "done", "error"]
 ConfidenceLabel = Literal["HIGH", "MEDIUM", "LOW"]
 Intent = Literal["descriptive", "causal"]
+# Alasan run agent berhenti (aturan produksi #3). Vocabulary + label bahasa manusia
+# ada di app/agent/termination.py.
+TerminationReason = Literal[
+    "completed", "step_budget", "token_budget", "timeout", "tool_error", "cancelled", "crashed",
+]
 SSEEventType = Literal[
     "plan", "intent", "step", "tool", "chart", "verify", "causal",
     "confidence", "final", "error",
@@ -111,6 +116,9 @@ class AnalysisResult(BaseModel):
     causal: dict[str, Any] | None = None
     causal_confidence: dict[str, Any] | None = None
     answer_grounded: bool = True
+    # Kenapa run berhenti. "completed" = model memberi jawaban final; sisanya
+    # menandakan jawaban kemungkinan belum tuntas (kena budget/timeout/error).
+    termination_reason: TerminationReason = "completed"
 
 
 # ── Streaming (SSE) ─────────────────────────────────────────────────────────
@@ -186,8 +194,19 @@ class RunRecord(BaseModel):
     tokens: int = 0
     cost_usd: float = 0.0
     duration_ms: int = 0
+    termination_reason: str = "completed"
     chart_paths: list[str] = Field(default_factory=list)
     created_at: str | None = None
+
+
+class ResumableRun(BaseModel):
+    """Run yang state-nya masih 'running' di checkpoint, kandidat resume setelah crash."""
+
+    run_id: str
+    question: str
+    dataset_id: str
+    intent: str = "descriptive"
+    updated_at: str | None = None
 
 
 class DatasetInfo(BaseModel):
@@ -219,6 +238,7 @@ EXPORTED_MODELS: list[type[BaseModel]] = [
     GoldSet,
     BatchSummary,
     RunRecord,
+    ResumableRun,
     DatasetInfo,
     EvalDashboard,
 ]
