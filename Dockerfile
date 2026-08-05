@@ -28,7 +28,11 @@ ENV USE_DOCKER=false \
     PYTHONUNBUFFERED=1 \
     MPLCONFIGDIR=/tmp/mpl
 
-# Jalankan dari backend/ supaya package `app` ke-resolve. Port 7860 = default HF Spaces.
+# Jalankan dari backend/ supaya package `app` ke-resolve.
 WORKDIR /app/backend
 EXPOSE 7860
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+
+# Bentuk shell (bukan exec) supaya ${PORT} benar-benar diekspansi. Render menyuntik
+# PORT sendiri (10000) dan menganggap service mati kalau tidak ada yang listen di
+# sana; 7860 dipakai sebagai fallback supaya `docker run` lokal tetap jalan apa adanya.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}
