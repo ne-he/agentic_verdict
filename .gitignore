@@ -42,3 +42,7 @@ agentic_analyst/
 # CLAUDE.md repo ini menandainya read-only reference, jadi diperlakukan sama dengan
 # agentic_analyst/: di-ignore, isinya dibiarkan di disk.
 verdict/
+
+# catatan kerja internal, bukan bagian dari produk
+CLAUDE.md
+docs/02_DESIGN_PROMPT.md

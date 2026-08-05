@@ -8,7 +8,7 @@
 > One-liner produk: *"An analyst that writes its own code, checks its own math — and when you ask WHY, proves it causally."*
 
 **Owner:** Nehemiah · **Status:** Spec (approved, pre-build) · **Target durasi:** 6–8 minggu
-**Eksekusi:** Claude Code — **baca file ini sebagai sumber kebenaran tunggal.** Aturan kerja harian ada di `CLAUDE.md` repo ini.
+**Dokumen ini adalah sumber kebenaran tunggal** untuk arsitektur, keputusan desain D1 sampai D9, dan urutan milestone M1 sampai M4.
 
 ---
 
@@ -197,7 +197,6 @@ ini menaikkan konversi?"* → agent recover true lift dalam CI → tunjukkan met
 ```
 agentic_verdict/
 ├── BLUEPRINT.md                      # file ini
-├── CLAUDE.md                         # aturan kerja harian Claude Code
 ├── README.md                         # identitas VERDICT ANALYST (tulis ulang di M1, final di M4)
 ├── Dockerfile                        # deploy HF Space (port dari ANALYST, update)
 ├── .env.example                      # GEMINI_API_KEY · GEMINI_MODEL · DATABASE_URL · USE_DOCKER
@@ -321,9 +320,9 @@ robocopy "..\agentic_analyst" "." /E `
   /XD .git .venv node_modules .next __pycache__ .pytest_cache analyst_backend.egg-info sandbox\artifacts sandbox\tmp `
   /XF analyst.db *.log q1_out.txt "Sample - Superstore.csv.zip" structure_dan_pengembangannya.docx .env
 
-# 2. JANGAN timpa BLUEPRINT.md & CLAUDE.md milik agentic_verdict (file ini).
+# 2. JANGAN timpa BLUEPRINT.md milik agentic_verdict (file ini).
 #    Kalau robocopy bawa README/docs lama ANALYST → boleh, nanti ditulis ulang di M1.
-#    docs/00_BLUEPRINT.md & 01_CLAUDE_CODE_TASKS.md lama ANALYST → hapus (sudah digantikan file ini).
+#    docs/00_BLUEPRINT.md lama ANALYST → hapus (sudah digantikan file ini).
 
 # 3. Init git BARU (jangan warisi history):
 git init && git add -A && git commit -m "M1 start: base copied from ANALYST"
