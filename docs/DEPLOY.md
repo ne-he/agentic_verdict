@@ -69,7 +69,7 @@ Space = repo git terpisah. Tambah sebagai remote lalu push (token write dipakai 
 atau jalankan `huggingface-cli login` dulu supaya kredensial tersimpan):
 
 ```bash
-# dari root repo agentic_analyst
+# dari root repo agentic_verdict (bukan agentic_analyst, itu folder referensi read-only)
 git remote add space https://huggingface.co/spaces/<user>/analyst-backend
 git push space main
 ```
@@ -87,7 +87,7 @@ Buka `https://<user>-analyst-backend.hf.space/health` → `{"status":"ok"}`.
 
 ## 3) Frontend — Vercel
 
-1. Vercel → **Add New → Project** → import repo `agentic_analyst`.
+1. Vercel → **Add New → Project** → import repo `ne-he/agentic_verdict`.
 2. **Root Directory:** `frontend`
 3. Framework: **Next.js** (auto-detect). Build/Output default.
 4. **Environment Variables:**
