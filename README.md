@@ -14,7 +14,7 @@ pinned: false
      **Live demo:** https://ne-he-verdict-analyst.hf.space  ·  frontend: https://verdict-analyst.vercel.app
      Slot ini sengaja ditaruh di bawah frontmatter, bukan di baris 1 file, karena baris 1 harus
      tetap `---` supaya Hugging Face Spaces bisa membaca konfigurasi sdk/app_file di atas. -->
-**Live demo:** *(belum di-deploy, lihat [`docs/DEPLOY.md`](docs/DEPLOY.md))*
+**Live demo:** backend API https://ne-he-verdict-analyst.hf.space ([`/health`](https://ne-he-verdict-analyst.hf.space/health) · [`/docs`](https://ne-he-verdict-analyst.hf.space/docs)) · frontend: *menyusul (Vercel)*
 
 # VERDICT ANALYST — Causal Analytics Agent
 
