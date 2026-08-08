@@ -1,0 +1,8 @@
+# Hugging Face Space (SDK gradio) meng-install dari requirements.txt di ROOT repo,
+# sedangkan Dockerfile memakai backend/requirements.txt. Daripada menduplikasi daftar
+# yang sama di dua tempat lalu lupa menyamakan versinya, file ini cuma meneruskan ke
+# sana. pip me-resolve path `-r` relatif terhadap file yang memuatnya.
+#
+# Paket `gradio` TIDAK ditulis di sini: Space memasangnya sendiri sesuai `sdk_version`
+# di frontmatter README.md.
+-r backend/requirements.txt

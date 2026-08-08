@@ -3,15 +3,17 @@ title: VERDICT ANALYST Causal Analytics Agent
 emoji: ⚖️
 colorFrom: gray
 colorTo: indigo
-sdk: docker
-app_port: 7860
+sdk: gradio
+sdk_version: 6.22.0
+python_version: 3.12.12
+app_file: space_app.py
 pinned: false
 ---
 
 <!-- LIVE URL: isi setelah deploy. Ganti seluruh baris "Live demo" di bawah dengan URL asli, contoh:
      **Live demo:** https://ne-he-verdict-analyst.hf.space  ·  frontend: https://verdict-analyst.vercel.app
      Slot ini sengaja ditaruh di bawah frontmatter, bukan di baris 1 file, karena baris 1 harus
-     tetap `---` supaya Hugging Face Spaces bisa membaca konfigurasi sdk/app_port di atas. -->
+     tetap `---` supaya Hugging Face Spaces bisa membaca konfigurasi sdk/app_file di atas. -->
 **Live demo:** *(belum di-deploy, lihat [`docs/DEPLOY.md`](docs/DEPLOY.md))*
 
 # VERDICT ANALYST — Causal Analytics Agent
