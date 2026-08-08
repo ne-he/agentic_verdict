@@ -15,7 +15,9 @@ import type {
 } from "./types";
 
 // Base URL backend dibaca dari env (jangan hardcode). Set di Vercel:
-//   NEXT_PUBLIC_API_URL=https://analyst-backend.onrender.com
+//   NEXT_PUBLIC_API_URL=https://ne-he-verdict-analyst.hf.space
+// Tanpa slash di akhir: nilai ini disambung langsung dengan path ("/datasets"),
+// jadi slash ganda bikin request meleset.
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
