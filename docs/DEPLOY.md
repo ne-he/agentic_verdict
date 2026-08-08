@@ -10,10 +10,22 @@ langkah. **JANGAN commit secret apa pun**: semua key diisi di Settings Space / V
 > (syarat email terverifikasi dan umur akun di atas 30 hari), dan ZeroGPU **hanya
 > kompatibel dengan SDK gradio**. Jadi jalurnya gradio, bukan pilihan estetika.
 >
-> **GPU-nya tidak dipakai.** Beban kerja proyek ini murni CPU (pandas, scipy, duckdb)
-> plus panggilan jaringan ke Gemini. Tidak ada fungsi yang didekorasi `@spaces.GPU`,
-> jadi kuota GPU harian (5 menit untuk akun gratis) tidak pernah tersentuh. Pola yang
-> sama sudah dipakai di Space `ne-he/phisguard-api`.
+> **Dua aturan ZeroGPU yang menentukan bentuk `space_app.py`.** Keduanya bikin Space
+> mati waktu dilanggar, dan keduanya sudah dibayar mahal di Space `ne-he/phisguard-api`:
+>
+> 1. App WAJIB dinyalakan lewat `.launch()` Gradio, **bukan `uvicorn.run()` manual**.
+>    Uvicorn manual bikin ZeroGPU tidak pernah aktif.
+> 2. WAJIB ada minimal satu fungsi ber-`@spaces.GPU` yang ter-register, kalau tidak
+>    runtime menolak start dengan "No @spaces.GPU function detected".
+>
+> Jembatannya `gradio.Server`, subclass FastAPI resmi milik Gradio yang boleh menerima
+> route sendiri tapi tetap dinyalakan lewat `.launch()`. Jadi rute API tetap di root
+> (`/health`, `/analyze`, ...) dan ZeroGPU tetap senang.
+>
+> **GPU-nya tetap tidak dipakai untuk kerja beneran.** Beban proyek ini murni CPU
+> (pandas, scipy, duckdb) plus panggilan jaringan ke Gemini. Fungsi `gpu_probe()` cuma
+> tiket masuk syarat nomor 2 dan tidak pernah dipanggil frontend, jadi kuota GPU harian
+> (5 menit untuk akun gratis) praktis tidak tersentuh.
 >
 > [`Dockerfile`](../Dockerfile) sengaja **dipertahankan**, tidak dihapus. Kalau
 > kebijakan HF berubah atau nanti pindah ke VPS, jalur Docker tinggal dipakai lagi
@@ -39,12 +51,21 @@ Vercel (Next.js)  ──HTTPS+SSE──►  HF Space (FastAPI, gradio SDK)  ─�
 | File | Peran |
 |---|---|
 | [`README.md`](../README.md) | Frontmatter: `sdk: gradio`, `sdk_version`, `python_version`, `app_file: space_app.py` |
-| [`space_app.py`](../space_app.py) | Entry point. Menaruh `backend/` di `sys.path`, set env setara Dockerfile, mount gradio ke FastAPI, jalankan uvicorn di 7860 |
-| [`requirements.txt`](../requirements.txt) | Space install dari root; isinya cuma `-r backend/requirements.txt` supaya versi tidak kembar |
+| [`space_app.py`](../space_app.py) | Entry point. Menaruh `backend/` di `sys.path`, set env setara Dockerfile, pasang router API ke `gradio.Server`, sediakan `gpu_probe()`, lalu `.launch()` di 7860 |
+| [`requirements.txt`](../requirements.txt) | Daftar dependensi untuk Space. Isinya **kembar** dengan `backend/requirements.txt`, lihat catatan di bawah |
 | [`packages.txt`](../packages.txt) | `libgomp1` (runtime OpenMP untuk scipy), pengganti `apt-get` di Dockerfile |
 
 Entry point-nya **bukan** `app.py` dengan sengaja: backend punya package bernama `app`
 (`backend/app/`), dan `app.py` di root akan menabraknya saat `import app.main`.
+
+**Kenapa `requirements.txt` di root isinya kembar, bukan `-r backend/requirements.txt`.**
+Pada tahap pip install, HF tidak menyalin isi repo. Yang dilakukan cuma me-mount satu
+file itu sendirian ke `/tmp/requirements.txt`, jadi `-r backend/requirements.txt`
+di-resolve jadi `/tmp/backend/requirements.txt` yang tidak ada dan build mati dengan
+`Could not open requirements file`. Duplikasinya dijaga
+[`backend/tests/test_requirements_sync.py`](../backend/tests/test_requirements_sync.py):
+kalau kedua file beda, test merah. Paritas rute Space vs `app.main` dijaga
+[`backend/tests/test_space_app.py`](../backend/tests/test_space_app.py).
 
 ---
 
@@ -101,12 +122,24 @@ Settings Space → **Variables and secrets**:
 | Key | Jenis | Nilai |
 |---|---|---|
 | `GEMINI_API_KEY` | Secret | key dari aistudio.google.com |
-| `DATABASE_URL` | Secret | connection string Neon (langkah 1) |
-| `ALLOWED_ORIGINS` | Variable | `https://<domain-vercel>` (diisi setelah langkah 3) |
+| `DATABASE_URL` | Secret | connection string Neon (langkah 1). Boleh dikosongkan dulu, lihat catatan di bawah |
 
 `USE_DOCKER=false`, `GEMINI_MODEL`, dan `MPLCONFIGDIR` sudah di-`setdefault` di
 `space_app.py`, jadi tidak perlu diisi. Kalau mau override, isi sebagai Variable dan
 nilainya akan menang.
+
+> **`ALLOWED_ORIGINS` tidak dipakai di Space, jadi jangan diisi.** Gradio memasang CORS
+> sendiri saat `.launch()`, dan `is_valid_origin`-nya memantulkan Origin apa pun selama
+> Host server bukan localhost. Di `*.hf.space` syarat itu otomatis terpenuhi, jadi
+> domain Vercel mana pun lolos tanpa dikonfigurasi. Menambah `CORSMiddleware` sendiri di
+> `space_app.py` justru merusak: `Access-Control-Allow-Origin` jadi dobel dan browser
+> menolak respons yang punya header itu lebih dari satu. `ALLOWED_ORIGINS` tetap
+> berlaku kalau self-host lewat [`Dockerfile`](../Dockerfile), karena di sana yang
+> jalan `app.main` langsung dengan CORSMiddleware-nya sendiri.
+
+> **Tanpa `DATABASE_URL` Space tetap jalan**, memakai SQLite di dalam Space. Semua fitur
+> hidup, tapi filesystem Space ephemeral: riwayat run hilang tiap Space rebuild atau
+> bangun dari tidur. Boleh deploy dulu tanpa Neon, isi belakangan, Space restart sendiri.
 
 ### d. Verifikasi
 Build pertama 6 sampai 12 menit (scipy lama di-install). Status **Running** → cek:
@@ -132,26 +165,25 @@ URL inilah yang dipakai sebagai `NEXT_PUBLIC_API_URL`, **bukan** URL
 | `NEXT_PUBLIC_API_URL` | `https://ne-he-verdict-analyst.hf.space` | URL Space, TANPA garis miring di akhir |
 
 5. Deploy → dapat domain `https://agentic-verdict-xxxx.vercel.app`.
-6. **Balik ke Settings Space**, set `ALLOWED_ORIGINS` = domain Vercel itu → Space
-   otomatis restart supaya CORS lolos.
+
+Tidak ada langkah balik ke Space setelah ini: CORS ditangani gradio dan sudah menerima
+domain Vercel mana pun (lihat catatan `ALLOWED_ORIGINS` di langkah 2c).
 
 ---
 
 ## 4) Urutan dan verifikasi
 
-1. Neon → dapat `DATABASE_URL`.
-2. HF Space (buat + push + secrets) → dapat URL → cek `/health`.
-3. Vercel frontend (`NEXT_PUBLIC_API_URL` = URL Space) → dapat domain.
-4. Space: set `ALLOWED_ORIGINS` = domain Vercel → restart.
-5. Buka domain Vercel → tanya 1 pertanyaan → pastikan SSE mengalir dan jawaban +
+1. HF Space (buat + push + `GEMINI_API_KEY`) → dapat URL → cek `/health`.
+2. Vercel frontend (`NEXT_PUBLIC_API_URL` = URL Space) → dapat domain.
+3. Buka domain Vercel → tanya 1 pertanyaan → pastikan SSE mengalir dan jawaban +
    verification muncul.
+4. Neon (opsional, kapan saja) → isi `DATABASE_URL` di Space supaya riwayat run awet.
 
-Langkah 4 tidak bisa ditukar dengan langkah 3. Sebelum domain Vercel ada, tidak ada nilai
-yang bisa diisikan ke `ALLOWED_ORIGINS`, dan selama itu kosong browser akan menolak semua
-request lintas origin.
+Neon sengaja ditaruh terakhir: tanpa itu app tetap jalan dengan SQLite, jadi ia bukan
+penghalang untuk melihat sistemnya hidup end to end.
 
 ### Checklist env (ringkas)
-- **HF Space:** `GEMINI_API_KEY` · `DATABASE_URL` · `ALLOWED_ORIGINS`
+- **HF Space:** `GEMINI_API_KEY` (wajib) · `DATABASE_URL` (opsional, biar riwayat awet)
 - **Vercel:** `NEXT_PUBLIC_API_URL`
 
 ---
@@ -193,7 +225,15 @@ pindah ke host berkuota ketat.
   `USE_DOCKER=true` + build image `backend/app/sandbox/image`.
 - **Secret:** tidak ada key di repo. `.env` dan `.env.local` di-gitignore; secret diisi di
   Settings Space, bukan di file.
-- **Belum pernah dibangun di Linux.** `requirements.txt` belum pernah di-`pip install`
-  bersih di Python 3.12 Linux dari mesin ini (tidak ada Docker di sini). Kalau build
-  pertama gagal, kemungkinan besar di resolusi versi scipy/pandas: ambil log build dari
-  tab **Logs** Space.
+- **`fastapi` dan `pydantic` dinaikkan demi gradio.** HF memasang
+  `gradio[oauth,mcp]==<sdk_version>` di perintah pip yang sama dengan
+  `requirements.txt`, dan gradio 6.15+ menuntut `starlette>=1.0.1` (yang dikunci
+  `<0.42` oleh fastapi 0.115) sementara extra `mcp` menuntut `pydantic>=2.11.10`.
+  Karena itu pin backend naik: `fastapi 0.115.* → 0.141.*`, `pydantic 2.9.* → 2.12.*`.
+  Seluruh test suite hijau di stack baru itu, jadi kenaikannya bukan taruhan.
+  Alternatifnya menurunkan `sdk_version` ke gradio ≤5.27 (satu-satunya rentang yang
+  masih cocok dengan pydantic 2.9), dan itu jauh lebih tua.
+- **Log build ada di tab Logs Space.** Kalau build merah, itu sumber kebenarannya.
+  Pesan yang sudah pernah muncul dan artinya:
+  `Could not open requirements file: '/tmp/backend/requirements.txt'` berarti
+  `requirements.txt` root memakai `-r` ke path repo (lihat §File di atas).

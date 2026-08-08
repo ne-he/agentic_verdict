@@ -1,8 +1,41 @@
-# Hugging Face Space (SDK gradio) meng-install dari requirements.txt di ROOT repo,
-# sedangkan Dockerfile memakai backend/requirements.txt. Daripada menduplikasi daftar
-# yang sama di dua tempat lalu lupa menyamakan versinya, file ini cuma meneruskan ke
-# sana. pip me-resolve path `-r` relatif terhadap file yang memuatnya.
+# Daftar dependensi untuk Hugging Face Space (SDK gradio).
 #
-# Paket `gradio` TIDAK ditulis di sini: Space memasangnya sendiri sesuai `sdk_version`
-# di frontmatter README.md.
--r backend/requirements.txt
+# KENAPA ISINYA DIDUPLIKASI DARI backend/requirements.txt, bukan `-r` ke sana:
+# pada tahap pip install, HF TIDAK menyalin isi repo. Yang dilakukan cuma
+# me-mount satu file ini sendirian ke /tmp/requirements.txt:
+#
+#   RUN --mount=target=/tmp/requirements.txt,source=requirements.txt \
+#       pip install --no-cache-dir -r /tmp/requirements.txt ...
+#
+# Akibatnya `-r backend/requirements.txt` di-resolve jadi /tmp/backend/requirements.txt
+# yang tidak ada, dan build mati dengan "Could not open requirements file".
+# Jadi daftarnya memang harus utuh di sini.
+#
+# Supaya tidak diam-diam melenceng dari backend/requirements.txt, ada
+# backend/tests/test_requirements_sync.py yang jadi merah kalau keduanya beda.
+# Kalau menambah dependensi: ubah backend/requirements.txt, lalu samakan di sini.
+#
+# `gradio`, `spaces`, `torch`, dan `uvicorn` TIDAK ditulis di sini: HF menambahkannya
+# sendiri di perintah pip yang sama sesuai `sdk_version` di frontmatter README.md.
+
+fastapi==0.141.*
+uvicorn[standard]==0.32.*
+pydantic==2.12.*
+pydantic-settings==2.6.*
+google-genai==0.8.*
+duckdb==1.1.*
+matplotlib==3.9.*
+pandas==2.2.*
+scipy==1.14.*
+python-dotenv==1.0.*
+httpx==0.27.*
+sqlalchemy==2.0.*
+
+# Driver Postgres untuk Neon (dipakai kalau DATABASE_URL=postgresql://...).
+# SQLite tidak butuh driver tambahan.
+psycopg2-binary==2.9.*
+
+# Docker SDK — hanya terpakai kalau USE_DOCKER=true (import lazy).
+# Di Space set USE_DOCKER=false (no Docker-in-Docker) → praktis tak terpakai,
+# tetap di-pin biar host yang mendukung Docker bisa pakai sandbox penuh.
+docker==7.1.*

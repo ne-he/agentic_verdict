@@ -1,9 +1,9 @@
 # Runtime deps untuk deploy (Render). Versi DIKUNCI (mirror pyproject.toml).
 # Dev tools (pytest) tidak termasuk — install lewat `pip install -e .[dev]` saat lokal.
 
-fastapi==0.115.*
+fastapi==0.141.*
 uvicorn[standard]==0.32.*
-pydantic==2.9.*
+pydantic==2.12.*
 pydantic-settings==2.6.*
 google-genai==0.8.*
 duckdb==1.1.*
