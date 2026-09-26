@@ -44,3 +44,13 @@
     outline-offset: 1px;
   }
 }
+
+@layer utilities {
+  /* Nav dan baris tab yang scroll horizontal di mobile: tetap bisa digeser, scrollbar disembunyikan. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

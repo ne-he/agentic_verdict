@@ -30,7 +30,7 @@ export function ConfidenceBadge({ c }: { c: ConfidenceBreakdown | null }) {
     return (
       <div className="w-[296px] border border-line bg-bg-soft px-[15px] py-[11px]">
         <span className="font-mono text-[11px] text-faint">
-          confidence — menunggu hasil
+          confidence: menunggu hasil
         </span>
       </div>
     );
@@ -64,7 +64,7 @@ export function ConfidenceBadge({ c }: { c: ConfidenceBreakdown | null }) {
       {open && (
         <div className="absolute inset-x-0 top-[46px] z-20 border border-line2 bg-panel px-[15px] py-[13px]">
           <div className="mb-[11px] font-mono text-[10px] tracking-[0.02em] text-faint">
-            COMPUTED — weighted signal model
+            COMPUTED · weighted signal model
           </div>
           <table className="w-full border-collapse font-mono text-[11.5px]">
             <tbody>

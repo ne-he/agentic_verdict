@@ -97,7 +97,7 @@ export function RoleMappingModal({
               {proposal.router_decision.method}
             </span>
             ). Analisis kausal <span className="text-warn">tidak akan jalan</span>{" "}
-            sebelum kamu konfirmasi — koreksi kalau usulannya salah.
+            sebelum kamu konfirmasi. Koreksi kalau usulannya salah.
           </p>
           <Field
             label="Treatment"

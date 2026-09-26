@@ -14,9 +14,34 @@ const mono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
+const TITLE = "VERDICT ANALYST · Causal Analytics Agent";
+const DESCRIPTION = "Ask anything. When you ask WHY, get a defensible answer.";
+const OG_IMAGE = {
+  url: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "VERDICT ANALYST, causal analytics agent",
+};
+
 export const metadata: Metadata = {
-  title: "VERDICT ANALYST — Causal Analytics Agent",
-  description: "Ask anything. When you ask WHY, get a defensible answer.",
+  // Basis URL absolut untuk og:image dan og:url (domain produksi Vercel).
+  metadataBase: new URL("https://agentic-verdict-sand.vercel.app"),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "VERDICT ANALYST",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [OG_IMAGE.url],
+  },
 };
 
 export default function RootLayout({

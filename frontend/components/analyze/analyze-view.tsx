@@ -98,7 +98,7 @@ export function AnalyzeView() {
             `› router: ${p.router_decision.method} (conf ${p.router_decision.confidence.toFixed(2)})${p.needs_confirmation ? " · butuh konfirmasi mapping" : ""}`,
           ]);
         } else {
-          setStreamLog((l) => [...l, "› causal engine selesai — angka dihitung deterministik"]);
+          setStreamLog((l) => [...l, "› causal engine selesai: angka dihitung deterministik"]);
         }
         break;
       }
@@ -165,7 +165,7 @@ export function AnalyzeView() {
           {
             num: String(s.length + 1).padStart(2, "0"),
             text: r.answer_markdown.replace(/\*\*/g, "").slice(0, 120),
-            conf: r.confidence ? `${r.confidence.label} ${Math.round(r.confidence.final * 100)}%` : "—",
+            conf: r.confidence ? `${r.confidence.label} ${Math.round(r.confidence.final * 100)}%` : "-",
             confKind: confKindFromLabel(r.confidence?.label),
             time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
           },
@@ -342,13 +342,13 @@ export function AnalyzeView() {
       {/* RIGHT: workspace */}
       <section className="flex min-w-0 flex-[999_1_560px] flex-col bg-bg">
         <div className="flex flex-wrap items-center gap-[11px] border-b border-line px-[22px] py-[11px] font-mono text-[11px] text-faint">
-          <span className="text-accent">{result ? `Run ${result.run_id}` : "Run —"}</span>
+          <span className="text-accent">{result ? `Run ${result.run_id}` : "Run -"}</span>
           <span className="text-[#2a2a2a]">|</span>
-          <span>{result ? `${result.duration_ms} ms` : "— ms"}</span>
+          <span>{result ? `${result.duration_ms} ms` : "- ms"}</span>
           <span className="text-[#2a2a2a]">|</span>
-          <span>{result ? `${result.tokens} tok` : "— tok"}</span>
+          <span>{result ? `${result.tokens} tok` : "- tok"}</span>
           <span className="text-[#2a2a2a]">|</span>
-          <span>{currentDataset?.dataset_id ?? "—"}</span>
+          <span>{currentDataset?.dataset_id ?? "-"}</span>
           {result && (
             <>
               <span className="text-[#2a2a2a]">|</span>
@@ -370,12 +370,12 @@ export function AnalyzeView() {
         )}
 
         <div className="flex flex-wrap items-start justify-between gap-6 border-b border-line px-[22px] py-4">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-[200px] flex-1">
             <div className="mb-[7px] text-[10px] uppercase tracking-[0.14em] text-faint">
               Active question
             </div>
-            <div className="max-w-[560px] text-[18px] font-semibold leading-[1.4] tracking-[-0.02em]">
-              {activeQuestion || "—"}
+            <div className="max-w-[560px] break-words text-[18px] font-semibold leading-[1.4] tracking-[-0.02em]">
+              {activeQuestion || "-"}
             </div>
           </div>
           <ConfidenceBadge c={confidence} />
@@ -398,7 +398,7 @@ export function AnalyzeView() {
 
         {error && (
           <div className="border-b border-line bg-fail/10 px-[22px] py-3 font-mono text-[12px] text-fail">
-            error — {error}
+            error: {error}
           </div>
         )}
 

@@ -112,28 +112,31 @@ export function WorkspaceTabs({
   const causalAlive = Boolean(result?.causal || causalProposal);
   return (
     <>
-      <div className="flex gap-5 border-b border-line px-[22px] pt-3">
-        {TABS.map((t) => {
-          const isActive = t.key === active;
-          return (
-            <button
-              key={t.key}
-              onClick={() => onTab(t.key)}
-              className={cn(
-                "relative pb-[10px] text-[13px] transition-colors",
-                isActive ? "text-ink" : "text-faint hover:text-muted",
-              )}
-            >
-              {t.label}
-              {t.key === "causal" && causalAlive && (
-                <span className="ml-[6px] font-mono text-[9px] text-accent">●</span>
-              )}
-              {isActive && (
-                <span className="absolute inset-x-0 -bottom-px h-[2px] bg-accent" />
-              )}
-            </button>
-          );
-        })}
+      {/* Layar sempit: baris tab scroll di wadahnya sendiri, bukan di halaman. */}
+      <div className="no-scrollbar flex-none overflow-x-auto">
+        <div className="flex w-max min-w-full gap-5 border-b border-line px-[22px] pt-3">
+          {TABS.map((t) => {
+            const isActive = t.key === active;
+            return (
+              <button
+                key={t.key}
+                onClick={() => onTab(t.key)}
+                className={cn(
+                  "relative flex-none whitespace-nowrap pb-[10px] text-[13px] transition-colors",
+                  isActive ? "text-ink" : "text-faint hover:text-muted",
+                )}
+              >
+                {t.label}
+                {t.key === "causal" && causalAlive && (
+                  <span className="ml-[6px] font-mono text-[9px] text-accent">●</span>
+                )}
+                {isActive && (
+                  <span className="absolute inset-x-0 -bottom-px h-[2px] bg-accent" />
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-[22px]">
@@ -173,7 +176,7 @@ function SummaryTab({ result }: { result: AnalysisResult | null }) {
             { label: "Confidence", value: `${Math.round(c.final * 100)}%`, sub: c.label },
             {
               label: "Verification",
-              value: result.verification ? (result.verification.passed ? "PASS" : "FAIL") : "—",
+              value: result.verification ? (result.verification.passed ? "PASS" : "FAIL") : "-",
               sub: result.verification ? `agreement ${result.verification.agreement.toFixed(2)}` : "no check",
             },
             { label: "Tool calls", value: String(result.tool_calls.length), sub: `${result.tokens} tok` },
@@ -214,7 +217,7 @@ function EvidenceTab({
         <Evidence
           tag="VERIFY"
           claim="Angka kunci diverifikasi 2 metode"
-          body={`Method A — ${verification.method_a}\nMethod B — ${verification.method_b}`}
+          body={`Method A: ${verification.method_a}\nMethod B: ${verification.method_b}`}
           result={`agreement ${verification.agreement.toFixed(3)} · ${verification.passed ? "consistent" : "discrepancy"}`}
         />
       )}
@@ -276,7 +279,7 @@ function CodeTab({
     <div className="flex max-w-[880px] flex-col gap-5 animate-fadein">
       <div className="flex items-center justify-between">
         <p className="m-0 font-mono text-[12.5px] text-faint">
-          Kode persis yang dieksekusi di sandbox — reproducible, re-run → hasil sama.
+          Kode persis yang dieksekusi di sandbox. Reproducible, re-run → hasil sama.
         </p>
         {onRerun && (
           <Button variant="outline" onClick={onRerun}>

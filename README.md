@@ -10,24 +10,20 @@ app_file: space_app.py
 pinned: false
 ---
 
-<!-- LIVE URL: isi setelah deploy. Ganti seluruh baris "Live demo" di bawah dengan URL asli, contoh:
-     **Live demo:** https://ne-he-verdict-analyst.hf.space  ·  frontend: https://verdict-analyst.vercel.app
-     Slot ini sengaja ditaruh di bawah frontmatter, bukan di baris 1 file, karena baris 1 harus
-     tetap `---` supaya Hugging Face Spaces bisa membaca konfigurasi sdk/app_file di atas. -->
-**Live demo:** backend API https://ne-he-verdict-analyst.hf.space ([`/health`](https://ne-he-verdict-analyst.hf.space/health) · [`/docs`](https://ne-he-verdict-analyst.hf.space/docs)) · frontend: *menyusul (Vercel)*
+**Live demo:** [https://agentic-verdict-sand.vercel.app](https://agentic-verdict-sand.vercel.app) · backend API https://ne-he-verdict-analyst.hf.space ([`/health`](https://ne-he-verdict-analyst.hf.space/health) · [`/docs`](https://ne-he-verdict-analyst.hf.space/docs))
 
-# VERDICT ANALYST — Causal Analytics Agent
+# VERDICT ANALYST: Causal Analytics Agent
 
 [![CI](https://github.com/ne-he/agentic_verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/ne-he/agentic_verdict/actions/workflows/ci.yml)
 
-<!-- DEMO GIF: rekam dulu pakai skenario di docs/DEMO_SHOTLIST.md, simpan ke docs/demo.gif,
-     lalu ganti baris di bawah ini dengan: ![Demo VERDICT ANALYST](docs/demo.gif) -->
 *(GIF demo 20 detik menyusul, skenario rekamannya sudah disiapkan di [`docs/DEMO_SHOTLIST.md`](docs/DEMO_SHOTLIST.md))*
 
 > *Ask anything. When you ask WHY, get a defensible answer.*
 >
-> Frontmatter di atas dipakai **Hugging Face Spaces** (backend di-deploy sebagai Docker Space,
-> port 7860). Frontend di Vercel. Lihat [`docs/DEPLOY.md`](docs/DEPLOY.md).
+> Frontmatter di atas dipakai **Hugging Face Spaces**: backend jalan sebagai Space ber-`sdk: gradio`
+> di hardware ZeroGPU lewat `space_app.py`, bukan Docker Space, karena Docker Space sekarang butuh
+> langganan PRO. `Dockerfile` tetap disimpan untuk self-host. Frontend di Vercel.
+> Lihat [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 Model frontier hari ini sudah rutin diminta memeriksa hasil kerjanya sendiri, dan tetap saja
 salah dengan penuh percaya diri. Analisis Snorkel AI terhadap 195 percobaan Opus 5 di
@@ -69,11 +65,11 @@ NEXT.JS 14 (Vercel) ── SSE ──▶ FASTAPI
                               EVAL HARNESS · SQLITE (runs/scorecards/gold)
 ```
 
-## Jalur kausal — kontrak kejujuran
+## Jalur kausal: kontrak kejujuran
 
-- **P1** — LLM tidak pernah menghitung angka kausal. Python hitung; Gemini narasi; number-grounding check menjaga.
-- **P2** — Tidak ada engine tanpa test recover ground-truth (`tests/causal_synthetic/` — DGP dengan true effect diketahui; `datasets/ab_marketing.meta.json` menyimpan ground-truth dataset demo sebagai bukti).
-- **P3** — Router selalu surface alasan + asumsi + boleh override. SRM check duluan: rasio sampel meleset = hasil busuk, di-flag merah sebelum apa pun.
+- **P1:** LLM tidak pernah menghitung angka kausal. Python hitung, Gemini narasi, number-grounding check menjaga.
+- **P2:** Tidak ada engine tanpa test recover ground-truth (`tests/causal_synthetic/` berisi DGP dengan true effect diketahui, `datasets/ab_marketing.meta.json` menyimpan ground-truth dataset demo sebagai bukti).
+- **P3:** Router selalu surface alasan + asumsi + boleh override. SRM check duluan: rasio sampel meleset = hasil busuk, di-flag merah sebelum apa pun.
 
 Confidence kausal (computed, breakdown tampil di UI):
 ```
@@ -190,7 +186,7 @@ SQLAlchemy 2.0 + SQLite · scipy/statsmodels · **Next.js 14** (App Router) + Ta
 Butuh 2 terminal. Prasyarat: **Python 3.11/3.12**, **Node 18+**, **Gemini API key**
 (aistudio.google.com). Docker opsional (`USE_DOCKER=false` → fallback subprocess).
 
-`/.env` (root — dibaca backend):
+`/.env` (root, dibaca backend):
 ```ini
 GEMINI_API_KEY=<key-kamu>
 GEMINI_MODEL=gemini-2.0-flash
@@ -203,7 +199,7 @@ USE_DOCKER=false
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-Terminal A — backend:
+Terminal A, backend:
 ```bash
 cd backend
 python -m venv .venv && .venv\Scripts\activate
@@ -213,7 +209,7 @@ pytest                                       # semua wajib hijau
 uvicorn app.main:app --reload --port 8000
 ```
 
-Terminal B — frontend:
+Terminal B, frontend:
 ```bash
 cd frontend
 npm install
@@ -223,10 +219,10 @@ npm run dev                                  # http://localhost:3000
 **Demo money-shot:** pilih dataset `ab_marketing`, tanya
 *"Apakah kampanye ini menaikkan konversi?"* → agent deteksi intent kausal → router usulkan
 mapping → konfirmasi lewat modal → efek ~+0.02 (true lift, lihat `datasets/ab_marketing.meta.json`)
-dalam CI, asumsi dicek, keputusan DEPLOY — semua angka dari engine, bukan LLM.
+dalam CI, asumsi dicek, keputusan DEPLOY. Semua angka dari engine, bukan LLM.
 
 ## What this can NOT tell you (jujur soal batas)
 
-- Jalur observational/timeseries/CATE belum aktif (M3) — router tetap jujur menolak, tidak mengarang hasil.
+- Jalur observational/timeseries/CATE belum aktif (M3). Router tetap jujur menolak, tidak mengarang hasil.
 - Multi-arm (>2 grup) belum didukung.
-- Unconfoundedness tidak pernah bisa dibuktikan dari data — hanya diasumsikan & diuji sensitivitasnya (M3).
+- Unconfoundedness tidak pernah bisa dibuktikan dari data, hanya diasumsikan & diuji sensitivitasnya (M3).

@@ -51,7 +51,7 @@ export function HistoryView() {
 
         {error && (
           <div className="mb-4 font-mono text-[12.5px] text-fail">
-            Gagal memuat — {error}. Pastikan backend jalan di :8000.
+            Gagal memuat: {error}. Pastikan backend jalan di :8000.
           </div>
         )}
 
@@ -91,7 +91,7 @@ export function HistoryView() {
                 {terminationLabel(r.termination_reason)}
               </span>
               <span className={cn("text-right font-mono text-[11px] text-faint")}>
-                {r.created_at ? new Date(r.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
+                {r.created_at ? new Date(r.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}
               </span>
             </div>
           ))}

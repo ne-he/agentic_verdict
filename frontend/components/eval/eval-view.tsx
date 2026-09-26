@@ -34,7 +34,7 @@ export function EvalView() {
   if (error)
     return (
       <div className="p-9 font-mono text-[12.5px] text-fail">
-        Gagal memuat dashboard — {error}
+        Gagal memuat dashboard: {error}
         <div className="mt-2 text-faint">Pastikan backend jalan di :8000.</div>
       </div>
     );
@@ -63,7 +63,7 @@ export function EvalView() {
           Reliability dashboard
         </h1>
         <p className="mb-6 text-[13px] leading-[1.6] text-faint">
-          Dinilai terhadap golden set. Tujuannya bukan 100% benar — tapi tahu
+          Dinilai terhadap golden set. Tujuannya bukan 100% benar, tapi tahu
           persis kapan agent salah.
         </p>
 

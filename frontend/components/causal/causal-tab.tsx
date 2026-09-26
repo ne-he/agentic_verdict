@@ -28,7 +28,7 @@ const decisionMeta: Record<string, { label: string; cls: string }> = {
 };
 
 const fmt = (x: number | null | undefined, digits = 4): string =>
-  x === null || x === undefined ? "—" : Number(x).toPrecision(digits);
+  x === null || x === undefined ? "-" : Number(x).toPrecision(digits);
 
 export function RouterDecisionCard({
   decision,
@@ -125,10 +125,10 @@ export function EffectSummary({ result }: { result: CausalResult }) {
               e.is_significant ? "text-pass" : "text-warn",
             )}
           >
-            {e.is_significant === null ? "—" : e.is_significant ? "SIG" : "NOT SIG"}
+            {e.is_significant === null ? "-" : e.is_significant ? "SIG" : "NOT SIG"}
           </div>
           <div className="mt-[8px] font-mono text-[11px] text-faint">
-            p = {e.p_value === null ? "—" : e.p_value.toExponential(2)}
+            p = {e.p_value === null ? "-" : e.p_value.toExponential(2)}
             {e.relative_lift !== null && ` · lift ${(e.relative_lift * 100).toFixed(2)}%`}
           </div>
         </div>
@@ -137,10 +137,10 @@ export function EffectSummary({ result }: { result: CausalResult }) {
             Power
           </div>
           <div className="font-mono text-[26px] font-semibold leading-none text-ink">
-            {p ? p.observed_n_per_arm.toLocaleString() : "—"}
+            {p ? p.observed_n_per_arm.toLocaleString() : "-"}
           </div>
           <div className="mt-[8px] font-mono text-[11px] text-faint">
-            n/arm · MDE {p ? fmt(p.mde_absolute, 3) : "—"}
+            n/arm · MDE {p ? fmt(p.mde_absolute, 3) : "-"}
             {typeof ms["cuped_variance_reduction"] === "number" &&
               ` · CUPED −${((ms["cuped_variance_reduction"] as number) * 100).toFixed(1)}% var`}
           </div>
@@ -252,7 +252,7 @@ export function CausalTab({
     <div className="flex max-w-[880px] flex-col gap-5 animate-fadein">
       {!causal && proposal && (
         <div className="border border-warn/50 bg-warn/5 px-4 py-3 text-[12.5px] leading-[1.6] text-[#bdbdbd]">
-          Router sudah mengusulkan mapping kolom — analisis menunggu{" "}
+          Router sudah mengusulkan mapping kolom, analisis menunggu{" "}
           <span className="text-warn">konfirmasi mapping</span> darimu (guardrail:
           analisis kausal tidak pernah jalan tanpa konfirmasi manusia).
         </div>
