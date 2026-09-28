@@ -3,7 +3,7 @@
 `get_react_loop` di-inject ke endpoint /analyze. Default: ReactLoop dengan Gemini live
 plus checkpointer SQLite (durable state per langkah → run bisa di-resume setelah crash).
 Saat test, override via `app.dependency_overrides[get_react_loop]` supaya pakai LLM mock
-(persis pola injectable di run_batch) — JANGAN andelin Gemini live di test.
+(persis pola injectable di run_batch), JANGAN andelin Gemini live di test.
 """
 
 from __future__ import annotations

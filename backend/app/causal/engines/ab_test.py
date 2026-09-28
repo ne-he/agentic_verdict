@@ -1,5 +1,5 @@
 """
-A/B engine — significance + CI + CUPED + power/MDE. (Port dari VERDICT.)
+A/B engine: significance + CI + CUPED + power/MDE. (Port dari VERDICT.)
 
 Memilih tes by tipe metrik:
 - outcome biner {0,1}      → two-proportion z-test
@@ -118,7 +118,7 @@ def run(df: pd.DataFrame, roles: ColumnRoles, options: CausalOptions) -> dict:
     n_dropped = len(df) - len(work)
 
     if work[outcome].nunique() < 2:
-        raise ValueError("outcome konstan — tidak ada variasi untuk diuji")
+        raise ValueError("outcome konstan, tidak ada variasi untuk diuji")
     binary = _is_binary(work[outcome])
 
     cuped_reduction = None

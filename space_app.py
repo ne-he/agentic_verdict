@@ -71,7 +71,7 @@ try:
     from app.db.session import create_tables
 
     create_tables()
-    print("[startup] migrasi DB selesai — tabel siap.")
+    print("[startup] migrasi DB selesai, tabel siap.")
 except Exception as exc:  # noqa: BLE001 - app tetap boot walau DB belum siap
     print(f"[startup] WARN: migrasi DB gagal: {exc}")
 

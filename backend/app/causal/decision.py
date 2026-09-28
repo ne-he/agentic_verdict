@@ -1,5 +1,5 @@
 """
-★ Decision rule — DETERMINISTIK (Python, bukan LLM). (Port dari VERDICT reporting/decision.py.)
+★ Decision rule, DETERMINISTIK (Python, bukan LLM). (Port dari VERDICT reporting/decision.py.)
 
 Mapping signifikansi × asumsi → keputusan bisnis. Ini yang dirender LLM jadi prosa,
 tapi keputusannya dihitung di sini (P1).

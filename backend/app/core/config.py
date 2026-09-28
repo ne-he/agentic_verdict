@@ -1,4 +1,4 @@
-"""Pengaturan terpusat — semua secret & konfigurasi dibaca dari env (lihat .env.example).
+"""Pengaturan terpusat: semua secret & konfigurasi dibaca dari env (lihat .env.example).
 
 ATURAN: jangan ada API key / nilai sensitif yang di-hardcode di sini.
 """

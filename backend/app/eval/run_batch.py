@@ -61,7 +61,7 @@ def run_batch(
         all_questions = all_questions[:max_questions]
 
     if verbose:
-        print(f"\n=== BATCH EVAL — {len(all_questions)} pertanyaan ===\n")
+        print(f"\n=== BATCH EVAL · {len(all_questions)} pertanyaan ===\n")
 
     scorecards: list[Scorecard] = []
 

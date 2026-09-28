@@ -1,5 +1,5 @@
 {
-  "description": "Eksperimen A/B marketing SINTETIK — dibuat dari DGP dengan ground-truth yang diketahui, untuk membuktikan engine kausal me-recover efek sebenarnya.",
+  "description": "Eksperimen A/B marketing SINTETIK, dibuat dari DGP dengan ground-truth yang diketahui, untuk membuktikan engine kausal me-recover efek sebenarnya.",
   "generator": "backend/tests/causal_synthetic/dgp_ab.py :: make_ab_binary",
   "seed": 42,
   "n_per_arm": 10000,

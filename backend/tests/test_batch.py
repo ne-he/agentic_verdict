@@ -1,4 +1,4 @@
-"""Acceptance T3.3 — Batch eval runner.
+"""Acceptance T3.3: Batch eval runner.
 
 Test pakai injectable run_fn (mock, tanpa Gemini/Docker) supaya cepat dan gratis.
 Verifikasi: semua pertanyaan diproses, agregat benar, save_fn dipanggil tiap run.

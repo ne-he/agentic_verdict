@@ -87,7 +87,7 @@ def _llm_correctness(
 def _hallucination_flag(result: AnalysisResult, correctness: float) -> bool:
     """True kalau agent 'yakin tapi salah': confidence HIGH/MEDIUM + correctness rendah.
 
-    Ini yang disebut Blueprint sebagai "confident but wrong" — klaim sesuatu
+    Ini yang disebut Blueprint sebagai "confident but wrong": klaim sesuatu
     yang tidak ada di data atau self-verify gagal tapi agent tetap percaya diri.
     """
     if correctness >= 0.5:

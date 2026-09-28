@@ -1,4 +1,4 @@
-"""Acceptance T3.2 — Grader & Metrics.
+"""Acceptance T3.2: Grader & Metrics.
 
 Test:
 - jawaban tepat → correctness 1.0

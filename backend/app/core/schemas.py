@@ -2,7 +2,7 @@
 
 ATURAN #5: schema didefinisikan di SINI sebelum endpoint/agent. Frontend meng-mirror
 file ini ke `frontend/lib/types.ts` (via `frontend/lib/schemas.json` yang di-export).
-Jangan duplikasi definisi tipe di tempat lain — ubah di sini, regenerate JSON schema.
+Jangan duplikasi definisi tipe di tempat lain: ubah di sini, regenerate JSON schema.
 """
 
 from __future__ import annotations
@@ -73,7 +73,7 @@ class VerificationResult(BaseModel):
 
 
 class ConfidenceBreakdown(BaseModel):
-    """Computed confidence (Blueprint §4.5) — BUKAN tebakan LLM.
+    """Computed confidence (Blueprint §4.5): BUKAN tebakan LLM.
 
     final = 0.40*answer_consistency + 0.30*verification_agreement
           + 0.20*tool_execution_success + 0.10*data_coverage

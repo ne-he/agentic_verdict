@@ -1,11 +1,11 @@
-"""Computed Confidence (Blueprint §4.5) — DIHITUNG, bukan ditebak LLM.
+"""Computed Confidence (Blueprint §4.5): DIHITUNG, bukan ditebak LLM.
 
 final = 0.40·answer_consistency + 0.30·verification_agreement
       + 0.20·tool_execution_success + 0.10·data_coverage
 label = HIGH (>=0.8) / MEDIUM (0.5–0.8) / LOW (<0.5)
 
 Tiap komponen punya makna eksplisit (bukan magic number):
-- answer_consistency: jawaban internal konsisten — diturunkan dari kontradiksi yang ditemukan
+- answer_consistency: jawaban internal konsisten, diturunkan dari kontradiksi yang ditemukan
   self-verify (atau di-override kalau ada pengukuran konsistensi multi-sample).
 - verification_agreement: kesepakatan cross-check method A vs B (VerificationResult.agreement).
 - tool_execution_success: proporsi tool call yang sukses (tanpa error).

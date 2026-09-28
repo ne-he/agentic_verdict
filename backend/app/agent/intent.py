@@ -1,6 +1,6 @@
 """Intent classification (BLUEPRINT D2): DESCRIPTIVE vs CAUSAL.
 
-Deterministik (regex keyword ID+EN) — bukan LLM: gratis, cepat, bisa di-test,
+Deterministik (regex keyword ID+EN), bukan LLM: gratis, cepat, bisa di-test,
 dan tidak menambah round-trip. Default saat ragu = DESCRIPTIVE (konservatif):
 salah masuk jalur kausal itu mahal (minta mapping + asumsi); salah masuk
 deskriptif cuma kurang dalam. Sinyal yang cocok DIKEMBALIKAN agar bisa
@@ -27,7 +27,7 @@ _CAUSAL_PATTERNS: list[tuple[str, str]] = [
     (r"\btreatment\b|\bperlakuan\b|\bkontrol vs\b|\bvs kontrol\b", "konteks treatment vs control"),
     (r"\blift\b|\buplift\b", "menanyakan lift eksperimen"),
     (
-        # "apakah X menaikkan/menurunkan Y" — pertanyaan efek intervensi
+        # "apakah X menaikkan/menurunkan Y": pertanyaan efek intervensi
         r"\bapakah\b.{0,60}\b(menaik|meningkat|menurun|mengurang|memperbaik|mendorong|menambah)",
         "pola 'apakah X menaikkan/menurunkan Y'",
     ),
@@ -50,13 +50,13 @@ def classify_intent(question: str) -> IntentDecision:
         return IntentDecision(
             intent="causal",
             signals=signals,
-            note="Pertanyaan terdeteksi kausal — jalur causal engine (LLM tidak menghitung angka).",
+            note="Pertanyaan terdeteksi kausal, jalur causal engine (LLM tidak menghitung angka).",
         )
     return IntentDecision(
         intent="descriptive",
         signals=[],
         note=(
-            "Tidak ada sinyal kausal — jalur deskriptif. Kalau maksudmu efek kausal "
+            "Tidak ada sinyal kausal, jalur deskriptif. Kalau maksudmu efek kausal "
             "X→Y, sebut kata 'efek/dampak/menyebabkan' dan tandai kolom treatment-nya."
         ),
     )

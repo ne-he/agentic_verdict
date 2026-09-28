@@ -1,4 +1,4 @@
-"""Acceptance T3.4 — SQLite persistence via SQLAlchemy 2.0.
+"""Acceptance T3.4: SQLite persistence via SQLAlchemy 2.0.
 
 Semua test pakai in-memory SQLite (":memory:") supaya tidak ada file sisa.
 Verifikasi: simpan run → query balik konsisten; simpan scorecard → query balik;
@@ -32,7 +32,7 @@ from app.db.repository import (
 
 @pytest.fixture
 def db_session():
-    """In-memory SQLite session — dibuat segar tiap test."""
+    """In-memory SQLite session: dibuat segar tiap test."""
     engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
     Base.metadata.create_all(engine)
     Session_ = sessionmaker(bind=engine, autocommit=False, autoflush=False)

@@ -1,4 +1,4 @@
-# Sandbox image untuk eksekusi kode hasil LLM — TERISOLASI.
+# Sandbox image untuk eksekusi kode hasil LLM: TERISOLASI.
 # Build:  docker build -t analyst-sandbox backend/app/sandbox/image
 # Lib di-whitelist (hanya yang dibutuhkan analitik). User non-root. No network saat run.
 FROM python:3.11-slim

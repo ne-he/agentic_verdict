@@ -1,4 +1,4 @@
-"""Bundle reproducible — rakit AnalysisResult lengkap + cek reproducibility.
+"""Bundle reproducible: rakit AnalysisResult lengkap + cek reproducibility.
 
 Bundle = jawaban + kode + chart + verification + confidence + snapshot dataset.
 Snapshot = hash file dataset saat run (provenance: tombol "Re-run this analysis" di UI nanti
@@ -19,7 +19,7 @@ _LOADER = "import pandas as pd\ndf = pd.read_csv(DATASET_PATH, encoding='{enc}')
 
 
 def dataset_snapshot(dataset_id: str) -> str:
-    """SHA-256 (12 char) dari file dataset — id snapshot stabil & deterministik."""
+    """SHA-256 (12 char) dari file dataset: id snapshot stabil & deterministik."""
     path = resolve_path(dataset_id)
     h = hashlib.sha256()
     with open(path, "rb") as f:

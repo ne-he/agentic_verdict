@@ -1,4 +1,4 @@
-"""Acceptance T1.2 — sandbox runner (Docker).
+"""Acceptance T1.2: sandbox runner (Docker).
 
 Butuh Docker Desktop jalan + image analyst-sandbox ter-build.
 Test di-skip otomatis kalau Docker tidak tersedia.

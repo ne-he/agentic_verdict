@@ -1,4 +1,4 @@
-"""Acceptance T2.1 — self-verify.
+"""Acceptance T2.1: self-verify.
 
 Cocok -> passed=True, agreement tinggi. Sengaja salah -> kontradiksi terdeteksi, passed=False.
 Cross-check pakai DuckDB in-process (tak butuh Docker).

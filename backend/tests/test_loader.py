@@ -1,4 +1,4 @@
-"""Acceptance T3.1 — Gold set loader & schema validator.
+"""Acceptance T3.1: Gold set loader & schema validator.
 
 Test:
 - loader baca superstore.json (20 Q) dengan benar

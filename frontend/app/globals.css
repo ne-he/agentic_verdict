@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Aksen brand — copper dari design. Ganti ke #5a9e6f kalau mau tema hijau. */
+  /* Aksen brand: copper dari design. Ganti ke #5a9e6f kalau mau tema hijau. */
   --accent: #c78d4e;
 }
 

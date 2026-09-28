@@ -1,4 +1,4 @@
-"""Acceptance T2.3 — chart + reproducible bundle.
+"""Acceptance T2.3: chart + reproducible bundle.
 
 PNG kebentuk + bundle lengkap (verification+confidence+snapshot) + re-run kode -> hasil sama.
 Bagian sandbox/chart butuh Docker (di-skip otomatis bila tak tersedia).

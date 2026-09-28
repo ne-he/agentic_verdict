@@ -1,4 +1,4 @@
-"""Acceptance T0.1 — app booting & /health."""
+"""Acceptance T0.1: app booting & /health."""
 
 from fastapi.testclient import TestClient
 

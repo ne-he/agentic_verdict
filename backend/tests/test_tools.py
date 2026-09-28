@@ -1,4 +1,4 @@
-"""Acceptance T1.3 — tiap tool jalan di Superstore CSV, output sesuai bentuk.
+"""Acceptance T1.3: tiap tool jalan di Superstore CSV, output sesuai bentuk.
 
 inspect_schema murni DuckDB (tak butuh Docker). write_and_execute & make_chart butuh sandbox;
 di-skip otomatis bila Docker tidak tersedia.
@@ -29,7 +29,7 @@ needs_docker = pytest.mark.skipif(
 
 
 def test_registry_has_six_tools():
-    # 3 deskriptif (ANALYST) + 3 kausal (VERDICT) — BLUEPRINT D6.
+    # 3 deskriptif (ANALYST) + 3 kausal (VERDICT): BLUEPRINT D6.
     reg = build_default_registry()
     assert set(reg.names()) == {
         "inspect_schema", "write_and_execute", "make_chart",

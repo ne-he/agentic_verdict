@@ -1,4 +1,4 @@
-"""Acceptance T4.4 — katalog multi-dataset (aktif berdasarkan keberadaan file)."""
+"""Acceptance T4.4: katalog multi-dataset (aktif berdasarkan keberadaan file)."""
 
 from __future__ import annotations
 

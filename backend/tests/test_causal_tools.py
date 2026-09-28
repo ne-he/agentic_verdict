@@ -1,6 +1,6 @@
 """Kontrak tools kausal: gate konfirmasi mapping (D3), routing, analisis end-to-end.
 
-Memakai dataset demo datasets/ab_marketing.csv (ground-truth di meta.json) —
+Memakai dataset demo datasets/ab_marketing.csv (ground-truth di meta.json):
 kalau file belum ada, di-generate on the fly dari DGP (deterministik, seed sama).
 """
 from __future__ import annotations

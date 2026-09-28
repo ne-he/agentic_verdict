@@ -1,7 +1,7 @@
-"""Tool: causal_route — usulkan mapping kolom + jalankan router metode kausal.
+"""Tool: causal_route, usulkan mapping kolom + jalankan router metode kausal.
 
 Output = RouterDecision (metode, confidence, reasons, assumptions) + usulan roles
-+ flag needs_confirmation. Analisis TIDAK jalan dari tool ini — hanya routing.
++ flag needs_confirmation. Analisis TIDAK jalan dari tool ini, hanya routing.
 Konfirmasi mapping oleh user adalah gate sebelum causal_analyze (D3).
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ class CausalRouteTool(Tool):
     description = (
         "Untuk pertanyaan KAUSAL: usulkan mapping kolom (treatment/outcome/covariates) dan "
         "tentukan metode kausal yang valid (router transparan: metode + alasan + asumsi). "
-        "Panggil ini SEBELUM causal_analyze. Argumen roles boleh kosong — tool akan "
+        "Panggil ini SEBELUM causal_analyze. Argumen roles boleh kosong, tool akan "
         "mengusulkan sendiri dari isi dataset."
     )
     parameters = {
@@ -64,7 +64,7 @@ class CausalRouteTool(Tool):
             if not roles_dict.get("outcome"):
                 return ToolRunResult(
                     error=(
-                        "outcome tidak teridentifikasi — sebutkan kolom outcome di argumen "
+                        "outcome tidak teridentifikasi, sebutkan kolom outcome di argumen "
                         f"(kolom tersedia: {list(df.columns)})"
                     )
                 )

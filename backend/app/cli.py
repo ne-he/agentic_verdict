@@ -1,4 +1,4 @@
-"""CLI ANALYST — jalankan ReAct loop end-to-end di terminal (gate M1).
+"""CLI ANALYST: jalankan ReAct loop end-to-end di terminal (gate M1).
 
 Contoh:
   python -m app.cli --dataset superstore --q "Berapa total penjualan keseluruhan?"

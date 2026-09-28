@@ -1,4 +1,4 @@
-"""Acceptance jalur deploy — sandbox via SUBPROCESS (USE_DOCKER=false).
+"""Acceptance jalur deploy: sandbox via SUBPROCESS (USE_DOCKER=false).
 
 Tidak butuh Docker → menutupi path yang dipakai di Render. Menguji:
 - kode pandas normal balikin output

@@ -1,4 +1,4 @@
--- Migration 001 — Initial schema (T3.4)
+-- Migration 001: Initial schema (T3.4)
 -- Jalankan sekali untuk setup DB manual (SQLAlchemy create_all() juga bisa dipakai).
 -- Tidak ada syntax SQLite-only supaya portable ke Postgres (Neon).
 

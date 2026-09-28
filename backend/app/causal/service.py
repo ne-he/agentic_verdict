@@ -1,7 +1,7 @@
 """Orkestrator jalur kausal: route → engine → assumptions → decision → confidence.
 
 Satu-satunya pintu masuk yang dipakai tools agent. Semua angka dihitung DI SINI
-(deterministik, P1) — LLM cuma menarasikan CausalResult yang sudah jadi.
+(deterministik, P1): LLM cuma menarasikan CausalResult yang sudah jadi.
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def load_dataset(dataset_id: str) -> pd.DataFrame:
 
 def suggest_roles(df: pd.DataFrame) -> dict:
     """Usulan mapping kolom (heuristik nama + isi). Agent menampilkan ini ke user
-    untuk DIKONFIRMASI (D3) — bukan untuk langsung dipakai."""
+    untuk DIKONFIRMASI (D3), bukan untuk langsung dipakai."""
     treatment_hints = ("group", "variant", "treatment", "arm", "grup", "perlakuan", "bucket")
     outcome_hints = ("convert", "outcome", "target", "revenue", "sales", "click", "churn", "konversi")
     time_hints = ("date", "time", "tanggal", "waktu", "timestamp")
@@ -79,7 +79,7 @@ def compute_causal_confidence(
     verification_agreement: float | None = None,
     tool_execution_success: float = 1.0,
 ) -> CausalConfidenceBreakdown:
-    """Confidence kausal — computed, breakdown wajib tampil (P5)."""
+    """Confidence kausal: computed, breakdown wajib tampil (P5)."""
     if assumptions:
         health = sum(_STATUS_SCORE[a.status] for a in assumptions) / len(assumptions)
     else:
@@ -131,7 +131,7 @@ def run_causal_analysis(
     else:
         # M3: observational (DoWhy+PSM), stretch: timeseries/CATE.
         raise NotImplementedError(
-            f"metode '{method.value}' belum diimplementasikan (roadmap M3) — "
+            f"metode '{method.value}' belum diimplementasikan (roadmap M3): "
             "router tetap transparan soal ini; gunakan A/B path atau tunggu M3"
         )
 

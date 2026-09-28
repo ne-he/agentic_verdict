@@ -1,7 +1,7 @@
 [project]
 name = "verdict-analyst-backend"
 version = "0.1.0"
-description = "VERDICT ANALYST — Causal Analytics Agent (backend): ANALYST agent × VERDICT causal engines"
+description = "VERDICT ANALYST, Causal Analytics Agent (backend): ANALYST agent × VERDICT causal engines"
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "fastapi==0.141.*",

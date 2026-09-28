@@ -1,4 +1,4 @@
-"""Acceptance T2.2 — computed confidence.
+"""Acceptance T2.2: computed confidence.
 
 Verifikasi tinggi -> HIGH + breakdown. Kontradiksi -> MEDIUM/LOW.
 """

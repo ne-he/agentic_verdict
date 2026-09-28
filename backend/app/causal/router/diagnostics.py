@@ -29,7 +29,7 @@ def standardized_mean_diff(
     """SMD tiap kovariat antara dua arm (asumsi treatment biner 0/1).
 
     SMD = (mean_treat - mean_control) / pooled_sd.
-    Kovariat kategorikal di-one-hot per level (indikator 0/1) — imbalance pada
+    Kovariat kategorikal di-one-hot per level (indikator 0/1), imbalance pada
     kategori (mis. platform, region) sama bahayanya dengan imbalance numerik.
     """
     groups = sorted(df[treatment_col].dropna().unique())

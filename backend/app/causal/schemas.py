@@ -159,7 +159,7 @@ class CausalConfidenceBreakdown(BaseModel):
 
 # ── Top-level result jalur kausal ────────────────────────────────────────────
 class CausalResult(BaseModel):
-    """Bundle lengkap satu analisis kausal — dikonsumsi agent & frontend tab Causal."""
+    """Bundle lengkap satu analisis kausal: dikonsumsi agent & frontend tab Causal."""
 
     dataset_id: str
     roles: ColumnRoles

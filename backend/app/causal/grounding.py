@@ -98,15 +98,15 @@ def check_grounding(prose: str, result: CausalResult) -> tuple[bool, list[str]]:
 
 
 _DECISION_LABEL = {
-    "deploy": "✅ DEPLOY — bukti cukup",
-    "deploy_with_caution": "⚠️ DEPLOY WITH CAUTION — signifikan, tapi ada asumsi yang perlu dimitigasi",
+    "deploy": "✅ DEPLOY, bukti cukup",
+    "deploy_with_caution": "⚠️ DEPLOY WITH CAUTION, signifikan, tapi ada asumsi yang perlu dimitigasi",
     "do_not_ship": "⛔ DO NOT SHIP",
-    "inconclusive": "❓ INCONCLUSIVE — belum bisa disimpulkan",
+    "inconclusive": "❓ INCONCLUSIVE, belum bisa disimpulkan",
 }
 
 
 def render_template(result: CausalResult) -> str:
-    """Jawaban deterministik dari CausalResult — fallback saat narasi LLM gagal
+    """Jawaban deterministik dari CausalResult: fallback saat narasi LLM gagal
     grounding (P1: lebih baik template jujur daripada prosa halu)."""
     lines: list[str] = []
     rd = result.router_decision
@@ -123,7 +123,7 @@ def render_template(result: CausalResult) -> str:
             seg += f", lift relatif {e.relative_lift*100:.2f}%"
         if e.p_value is not None:
             seg += f", p-value {e.p_value:.3g}"
-        seg += " — " + ("**signifikan**" if e.is_significant else "**tidak signifikan**")
+        seg += " · " + ("**signifikan**" if e.is_significant else "**tidak signifikan**")
         lines.append(seg)
 
     if result.power is not None:

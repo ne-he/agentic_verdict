@@ -1,5 +1,5 @@
 """
-★ ROUTER — otak pemilih metode. (Port dari VERDICT; spec: VERDICT_BLUEPRINT.md §2.)
+★ ROUTER: otak pemilih metode. (Port dari VERDICT; spec: VERDICT_BLUEPRINT.md §2.)
 
 Mengikuti P3: SELALU mengembalikan reasons[] + assumptions_required[], dan
 allow_override=True. Default ke metode lebih konservatif kalau ragu.
@@ -31,11 +31,11 @@ def route(
     declared_type: DeclaredType = DeclaredType.AUTO,
     expected_ratio: float | None = None,
 ) -> RouterDecision:
-    # STEP 0 — outcome wajib
+    # STEP 0: outcome wajib
     if roles.outcome not in df.columns:
-        raise ValueError("kolom outcome tidak ada — minta mapping ulang")
+        raise ValueError("kolom outcome tidak ada, minta mapping ulang")
 
-    # STEP 1 — tidak ada treatment → time-series atau deskriptif
+    # STEP 1: tidak ada treatment → time-series atau deskriptif
     if not roles.treatment:
         if roles.timestamp and roles.intervention_date:
             return RouterDecision(
@@ -54,21 +54,21 @@ def route(
         return RouterDecision(
             method=Method.DESCRIPTIVE,
             confidence=0.3,
-            reasons=["Tidak ada treatment maupun tanggal intervensi — klaim kausal tidak bisa ditegakkan."],
+            reasons=["Tidak ada treatment maupun tanggal intervensi, klaim kausal tidak bisa ditegakkan."],
             assumptions_required=["Hanya analisis deskriptif; jangan tafsirkan sebagai kausal."],
         )
 
-    # STEP 1.5 — jumlah arm harus tepat 2 (multi-arm belum didukung)
+    # STEP 1.5: jumlah arm harus tepat 2 (multi-arm belum didukung)
     n_arms = int(df[roles.treatment].dropna().nunique())
     if n_arms < 2:
-        raise ValueError("kolom treatment hanya punya 1 nilai — tidak ada pembanding")
+        raise ValueError("kolom treatment hanya punya 1 nilai, tidak ada pembanding")
     if n_arms > 2:
         raise ValueError(
-            f"terdeteksi {n_arms} arm — versi ini baru mendukung 2 arm "
+            f"terdeteksi {n_arms} arm, versi ini baru mendukung 2 arm "
             "(kontrol vs treatment); filter data ke 2 arm dulu"
         )
 
-    # STEP 2 — diagnostik
+    # STEP 2: diagnostik
     smd = standardized_mean_diff(df, roles.treatment, roles.covariates)
     srm = sample_ratio_mismatch(df, roles.treatment, expected_ratio)
     worst_smd = max_abs_smd(smd)
@@ -79,7 +79,7 @@ def route(
     n_per_arm = int(df[roles.treatment].value_counts().min())
     cate_addon = (len(roles.covariates) > 0 and n_per_arm >= CATE_MIN_N_PER_ARM)
 
-    # STEP 3 — putuskan kebersihan
+    # STEP 3: putuskan kebersihan
     if declared_type == DeclaredType.OBSERVATIONAL:
         return _observational(diagnostics, cate_addon, reason="User mendeklarasikan data observasional.")
 
@@ -98,7 +98,7 @@ def route(
             # tidak ada kovariat → keacakan TIDAK terverifikasi dari data
             confidence = 0.5
             reasons.append(
-                "Tidak ada kovariat untuk uji balance — keacakan assignment tidak bisa "
+                "Tidak ada kovariat untuk uji balance, keacakan assignment tidak bisa "
                 "diverifikasi dari data; A/B dipilih karena tanpa kovariat metode "
                 "adjustment (observasional) tidak mungkin."
             )
@@ -106,7 +106,7 @@ def route(
                 "Sertakan kovariat pra-eksperimen agar balance bisa diverifikasi."
             )
         if srm["srm_detected"]:
-            reasons.append("⚠️ SRM TERDETEKSI — rasio sampel meleset dari desain; hasil harus ditandai berisiko.")
+            reasons.append("⚠️ SRM TERDETEKSI, rasio sampel meleset dari desain; hasil harus ditandai berisiko.")
             assumptions.append("PERIKSA pipeline assignment: SRM = bias mekanis, bukan efek nyata.")
             confidence = min(confidence, 0.5)
         return RouterDecision(
@@ -121,7 +121,7 @@ def route(
     return _observational(
         diagnostics,
         cate_addon,
-        reason=f"Kovariat tidak seimbang (max |SMD| = {worst_smd:.3f} ≥ {SMD_BALANCE_THRESHOLD}) — indikasi confounding.",
+        reason=f"Kovariat tidak seimbang (max |SMD| = {worst_smd:.3f} ≥ {SMD_BALANCE_THRESHOLD}), indikasi confounding.",
     )
 
 

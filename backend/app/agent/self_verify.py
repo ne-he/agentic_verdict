@@ -1,4 +1,4 @@
-"""Self-Verify — verifikasi nyata, BUKAN "minta LLM cek ulang" (Blueprint Tier A #4).
+"""Self-Verify: verifikasi nyata, BUKAN "minta LLM cek ulang" (Blueprint Tier A #4).
 
 Tiga mekanisme:
   1. Numerical cross-check (WAJIB): angka kunci dari agent (method A, hasil sandbox pandas)

@@ -1,8 +1,8 @@
-"""Tool: causal_analyze — jalankan pipeline kausal penuh (deterministik).
+"""Tool: causal_analyze, jalankan pipeline kausal penuh (deterministik).
 
 GATE D3: hanya jalan kalau mapping kolom SUDAH dikonfirmasi user
 (_confirmed_roles di-inject loop dari AnalyzeRequest.causal_roles).
-LLM tidak pernah menghitung angka (P1) — tool ini mengembalikan CausalResult
+LLM tidak pernah menghitung angka (P1), tool ini mengembalikan CausalResult
 utuh; narasi final agent akan dicek number-grounding terhadap object ini.
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ class CausalAnalyzeTool(Tool):
     description = (
         "Jalankan analisis kausal penuh (efek + CI + p-value + power/MDE + cek asumsi + "
         "keputusan ship/hold) memakai mapping kolom yang SUDAH dikonfirmasi user. "
-        "SEMUA angka dihitung engine deterministik — jangan hitung/ubah angka sendiri; "
+        "SEMUA angka dihitung engine deterministik, jangan hitung/ubah angka sendiri; "
         "kutip angka persis dari output tool ini."
     )
     parameters = {
@@ -51,7 +51,7 @@ class CausalAnalyzeTool(Tool):
             return ToolRunResult(
                 error=(
                     "KONFIRMASI DIBUTUHKAN: mapping kolom belum dikonfirmasi user (D3). "
-                    "Jangan panggil tool ini lagi — beri jawaban final berisi usulan mapping "
+                    "Jangan panggil tool ini lagi, beri jawaban final berisi usulan mapping "
                     "dari causal_route dan minta user mengonfirmasi lewat panel Causal."
                 )
             )

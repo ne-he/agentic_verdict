@@ -1,8 +1,8 @@
-"""Planner — ubah pertanyaan NL jadi rencana langkah eksplisit (list[PlanStep]).
+"""Planner: ubah pertanyaan NL jadi rencana langkah eksplisit (list[PlanStep]).
 
 Rencana ini juga menyetir progress bar UI (Blueprint Tier A #2). Pakai Gemini untuk
 menghasilkan plan terstruktur (JSON). Fungsi `generate` di-inject agar bisa di-mock saat test
-(hemat kuota) — default-nya memanggil Gemini.
+(hemat kuota), default-nya memanggil Gemini.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ Pertanyaan: {question}
 # Instruksi tambahan saat intent = causal (BLUEPRINT D2).
 CAUSAL_PLAN_NOTE = (
     "CATATAN: Pertanyaan ini KAUSAL. Rencana WAJIB memakai causal_route lalu "
-    "causal_analyze untuk menghitung efek — JANGAN pakai write_and_execute untuk "
+    "causal_analyze untuk menghitung efek, JANGAN pakai write_and_execute untuk "
     "menghitung efek kausal. write_and_execute hanya untuk eksplorasi pendukung."
 )
 

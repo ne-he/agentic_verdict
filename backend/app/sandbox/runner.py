@@ -1,9 +1,9 @@
-"""Sandbox runner — eksekusi kode hasil LLM secara TERISOLASI.
+"""Sandbox runner: eksekusi kode hasil LLM secara TERISOLASI.
 
 Aturan #6: kode LLM HANYA jalan di sini, JANGAN pernah exec()/eval() di proses backend.
 
 Mode utama: Docker (--network none, limit mem/cpu/timeout, non-root, auto-remove).
-Fallback (USE_DOCKER=false): subprocess + timeout (+ resource limit di POSIX) — untuk dev cepat,
+Fallback (USE_DOCKER=false): subprocess + timeout (+ resource limit di POSIX), untuk dev cepat,
 TIDAK seaman Docker (ada network). Target portfolio tetap Docker.
 """
 
@@ -39,7 +39,7 @@ DATASET_PATH = _os.environ.get("DATASET_PATH", "{dataset_path}")
 
 
 class SandboxResult(BaseModel):
-    """Hasil satu eksekusi sandbox (internal — bukan kontrak API)."""
+    """Hasil satu eksekusi sandbox (internal, bukan kontrak API)."""
 
     stdout: str = ""
     stderr: str = ""

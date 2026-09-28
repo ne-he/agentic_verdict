@@ -1,8 +1,8 @@
 """
-Assumptions layer — checklist asumsi (pass/warn/fail) per metode. (Port dari VERDICT.)
+Assumptions layer: checklist asumsi (pass/warn/fail) per metode. (Port dari VERDICT.)
 
 translator.py yang ubah jadi kalimat bisnis + risk badge.
-A/B yang sudah bisa diisi dari diagnostics router (SRM, power) — implement duluan.
+A/B yang sudah bisa diisi dari diagnostics router (SRM, power), implement duluan.
 Observasi/time-series checks menyusul di M3 (butuh output engine-nya).
 """
 from __future__ import annotations
@@ -37,7 +37,7 @@ def checks_for_ab(
         )
     )
 
-    # Power — WARN kalau hasil non-signifikan DAN efek teramati < MDE:
+    # Power: WARN kalau hasil non-signifikan DAN efek teramati < MDE:
     # artinya "tidak signifikan" bisa cuma karena sampel kurang, bukan efek nol.
     mde = power.get("mde_absolute")
     if mde is None:

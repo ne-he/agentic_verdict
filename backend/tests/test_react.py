@@ -1,4 +1,4 @@
-"""Acceptance T1.5 (unit) — ReAct loop orkestrasi dgn Gemini di-mock (tanpa kuota/Docker).
+"""Acceptance T1.5 (unit): ReAct loop orkestrasi dgn Gemini di-mock (tanpa kuota/Docker).
 
 Aksi di-script supaya hanya pakai inspect_schema (murni DuckDB) lalu final -> tak butuh sandbox.
 Test live end-to-end via CLI + Gemini asli dijalankan terpisah (lihat laporan).

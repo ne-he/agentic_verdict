@@ -8,7 +8,7 @@ Tabel:
   - run_states    : durable state satu run agent (header) supaya bisa di-resume
   - run_steps     : satu baris per iterasi loop agent (durable state per langkah)
 
-Tidak ada tipe kolom SQLite-only — semua standar SQLAlchemy supaya portable ke Postgres.
+Tidak ada tipe kolom SQLite-only, semua standar SQLAlchemy supaya portable ke Postgres.
 """
 
 from __future__ import annotations

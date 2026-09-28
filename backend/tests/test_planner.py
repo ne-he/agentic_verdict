@@ -1,4 +1,4 @@
-"""Acceptance T1.4 — 3 pertanyaan contoh -> plan terstruktur valid.
+"""Acceptance T1.4: 3 pertanyaan contoh -> plan terstruktur valid.
 
 Gemini di-mock (generate di-inject) supaya tidak boros kuota.
 """

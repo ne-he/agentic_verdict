@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * RoleMappingModal (BLUEPRINT D3) — gate manusia sebelum analisis kausal.
+ * RoleMappingModal (BLUEPRINT D3): gate manusia sebelum analisis kausal.
  * Agent MENGUSULKAN mapping; user koreksi & konfirmasi; analisis di-re-run
- * dengan causal_roles terkonfirmasi. Fungsional dulu — polish design menyusul.
+ * dengan causal_roles terkonfirmasi. Fungsional dulu, polish design menyusul.
  */
 
 import { useEffect, useState } from "react";

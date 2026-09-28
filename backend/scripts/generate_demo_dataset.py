@@ -37,7 +37,7 @@ def main() -> None:
 
     meta = {
         "description": (
-            "Eksperimen A/B marketing SINTETIK — dibuat dari DGP dengan ground-truth "
+            "Eksperimen A/B marketing SINTETIK, dibuat dari DGP dengan ground-truth "
             "yang diketahui, untuk membuktikan engine kausal me-recover efek sebenarnya."
         ),
         "generator": "backend/tests/causal_synthetic/dgp_ab.py :: make_ab_binary",

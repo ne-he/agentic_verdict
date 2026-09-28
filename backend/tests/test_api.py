@@ -1,6 +1,6 @@
-"""Acceptance T4.1 — FastAPI endpoints + SSE.
+"""Acceptance T4.1: FastAPI endpoints + SSE.
 
-Semua test pakai ReactLoop ber-LLM scripted (di-inject via dependency override) —
+Semua test pakai ReactLoop ber-LLM scripted (di-inject via dependency override),
 TIDAK menyentuh Gemini live. Hanya inspect_schema (DuckDB) + verify (DuckDB) yang jalan,
 jadi tak butuh Docker.
 
@@ -274,7 +274,7 @@ def test_analyze_emits_error_event(tmp_path):
 
 @pytest.mark.skipif(
     os.getenv("RUN_LIVE") != "1",
-    reason="live Gemini + Docker — set RUN_LIVE=1 untuk jalankan manual",
+    reason="live Gemini + Docker: set RUN_LIVE=1 untuk jalankan manual",
 )
 def test_analyze_live_smoke():  # pragma: no cover - butuh API key + kuota
     configure_database(None)

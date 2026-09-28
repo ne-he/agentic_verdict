@@ -1,4 +1,4 @@
-"""Acceptance T0.2 — instansiasi tiap model dengan contoh valid + export JSON schema."""
+"""Acceptance T0.2: instansiasi tiap model dengan contoh valid + export JSON schema."""
 
 import pytest
 from pydantic import ValidationError

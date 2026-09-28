@@ -142,7 +142,7 @@ export function AnalyzeView() {
         break;
       }
       case "confidence": {
-        // Payload kausal dibungkus {causal: {...}} — pisahkan dari confidence standar.
+        // Payload kausal dibungkus {causal: {...}}, pisahkan dari confidence standar.
         if ("causal" in ev.data) {
           setCausalConfidence(ev.data.causal as unknown as CausalConfidenceBreakdown);
         } else {

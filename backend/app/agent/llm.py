@@ -31,7 +31,7 @@ def _is_daily_quota_exhausted(err: Exception) -> bool:
     """True kalau 429 karena daily quota habis (bukan per-minute).
 
     Deteksi via e.details (dict parsed dari response JSON) → quotaId 'PerDay'.
-    Kalau daily quota habis, retry tidak akan membantu — fail-fast dengan pesan jelas.
+    Kalau daily quota habis, retry tidak akan membantu: fail-fast dengan pesan jelas.
     """
     details = getattr(err, "details", {}) or {}
     error_details = details.get("error", {}).get("details", []) if isinstance(details, dict) else []

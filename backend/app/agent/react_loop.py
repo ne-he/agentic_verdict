@@ -1,4 +1,4 @@
-"""ReAct loop (Custom) — orkestrasi: Planner -> loop(pilih tool -> eksekusi -> observasi) -> jawaban.
+"""ReAct loop (Custom) · orkestrasi: Planner -> loop(pilih tool -> eksekusi -> observasi) -> jawaban.
 
 Protokol: tiap giliran model membalas JSON, salah satu dari:
   {"thought": "...", "action": "<tool>", "args": {...}}   -> kita eksekusi tool, umpan balik observasi
@@ -58,7 +58,7 @@ data, lewat tools. Jangan mengarang angka. Kalau data tidak mendukung, katakan a
 Tools tersedia:
 {tool_docs}
 
-Protokol — balas SATU objek JSON saja (tanpa code fence), salah satu bentuk:
+Protokol: balas SATU objek JSON saja (tanpa code fence), salah satu bentuk:
 1) Memanggil tool:
    {{"thought": "alasan singkat", "action": "<nama_tool>", "args": {{...sesuai parameter tool...}}}}
 2) Jawaban final (setelah cukup bukti):
@@ -75,7 +75,7 @@ Jangan memanggil tool lebih dari perlu.
 # Instruksi tambahan saat intent = causal (BLUEPRINT D2/D3/P1).
 _CAUSAL_UNCONFIRMED = """
 PERTANYAAN INI KAUSAL. Aturan jalur kausal (WAJIB):
-- Panggil causal_route untuk mengusulkan mapping kolom + metode. JANGAN panggil causal_analyze —
+- Panggil causal_route untuk mengusulkan mapping kolom + metode. JANGAN panggil causal_analyze:
   mapping BELUM dikonfirmasi user.
 - Jawaban final: sampaikan usulan mapping (treatment/outcome/covariates), metode yang diusulkan
   router beserta alasannya, lalu minta user KONFIRMASI mapping lewat panel Causal.
@@ -86,7 +86,7 @@ _CAUSAL_CONFIRMED = """
 PERTANYAAN INI KAUSAL dan mapping kolom SUDAH dikonfirmasi user: {roles}
 Aturan jalur kausal (WAJIB):
 - Panggil causal_route (mapping terkonfirmasi dipakai otomatis), lalu causal_analyze.
-- SEMUA angka efek berasal dari output causal_analyze — kutip persis, JANGAN menghitung sendiri
+- SEMUA angka efek berasal dari output causal_analyze, kutip persis, JANGAN menghitung sendiri
   dan JANGAN membulatkan berlebihan. Jawaban final akan dicek number-grounding terhadap hasil engine.
 - Jawaban final: efek + CI + signifikansi, alasan metode dari router, status asumsi, dan keputusan
   (deploy/hold) dari engine.
@@ -187,7 +187,7 @@ class ReactLoop:
         run_id = run_id or f"run_{uuid.uuid4().hex[:10]}"
         emit = on_event or (lambda _e: None)
 
-        # 0) Intent classification (D2) — deterministik, transparan di investigation log.
+        # 0) Intent classification (D2): deterministik, transparan di investigation log.
         intent = classify_intent(question)
         emit(SSEEvent(type="intent", data=intent.model_dump()))
 

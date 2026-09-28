@@ -23,7 +23,7 @@ async def lifespan(_app: FastAPI):
         from app.db.session import create_tables
 
         create_tables()
-        print("[startup] migrasi DB selesai — tabel siap.")
+        print("[startup] migrasi DB selesai, tabel siap.")
     except Exception as exc:  # noqa: BLE001 - app tetap boot walau DB belum siap
         # Jangan matikan app (health check tetap hijau); endpoint DB akan error sampai DB benar.
         print(f"[startup] WARN: migrasi DB gagal: {exc}")
@@ -31,7 +31,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(
-    title="ANALYST — Verified Analytics Agent",
+    title="ANALYST · Verified Analytics Agent",
     version=__version__,
     description="Ask questions. See the evidence. Verify every number.",
     lifespan=lifespan,

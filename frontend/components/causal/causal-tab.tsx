@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Tab Causal — render CausalResult dari backend (BLUEPRINT M2).
+ * Tab Causal: render CausalResult dari backend (BLUEPRINT M2).
  * SEMUA angka di sini berasal dari engine deterministik (P1); komponen ini
- * murni presentasi. Styling fungsional konsisten tema — polish design menyusul.
+ * murni presentasi. Styling fungsional konsisten tema, polish design menyusul.
  */
 
 import type {

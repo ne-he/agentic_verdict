@@ -1,4 +1,4 @@
-"""Tool: causal_refute — robustness/refutation test. KONTRAK M1, implementasi M3.
+"""Tool: causal_refute, robustness/refutation test. KONTRAK M1, implementasi M3.
 
 Kontraknya didefinisikan sekarang (BLUEPRINT D6) supaya schema API & frontend stabil.
 Placebo treatment, random common cause, dan sensitivity analysis butuh jalur
@@ -13,7 +13,7 @@ class CausalRefuteTool(Tool):
     name = "causal_refute"
     description = (
         "Uji ketahanan hasil kausal (placebo treatment, random common cause, sensitivity). "
-        "BELUM tersedia di versi ini (roadmap M3) — jangan panggil kecuali user memaksa; "
+        "BELUM tersedia di versi ini (roadmap M3), jangan panggil kecuali user memaksa; "
         "kalau terpanggil, sampaikan apa adanya bahwa refutation menyusul di M3."
     )
     parameters = {
@@ -36,6 +36,6 @@ class CausalRefuteTool(Tool):
             error=(
                 "NotImplementedError: refutation suite (placebo / random common cause / "
                 "sensitivity) dibangun di M3 bersama jalur observational (DoWhy, Docker). "
-                "Sampaikan ini apa adanya ke user — jangan mengarang hasil refutation."
+                "Sampaikan ini apa adanya ke user, jangan mengarang hasil refutation."
             )
         )

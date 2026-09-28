@@ -1,4 +1,4 @@
-"""Tool: inspect_schema — kolom, tipe, jumlah baris, sample 5 baris (via DuckDB)."""
+"""Tool: inspect_schema · kolom, tipe, jumlah baris, sample 5 baris (via DuckDB)."""
 
 from __future__ import annotations
 

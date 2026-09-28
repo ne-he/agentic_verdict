@@ -86,7 +86,7 @@ def test_confirmed_flow_produces_causal_result_and_confidence():
         [
             {"action": "causal_route", "args": {}},
             {"action": "causal_analyze", "args": {}},
-            {"final": "Efek positif dan signifikan — detail angka di panel Causal.", "code": ""},
+            {"final": "Efek positif dan signifikan, detail angka di panel Causal.", "code": ""},
         ]
     )
     res = ReactLoop(generate=llm).run(

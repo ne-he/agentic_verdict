@@ -1,4 +1,4 @@
-"""Repo layer — simpan & query run_history, scorecards, gold_questions, artifacts (T3.4).
+"""Repo layer: simpan & query run_history, scorecards, gold_questions, artifacts (T3.4).
 
 Semua fungsi terima Session opsional (untuk test bisa inject in-memory session).
 Bila session=None, buka session baru dari pool lalu tutup otomatis.
