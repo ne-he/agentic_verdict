@@ -55,7 +55,7 @@ export function TopBar() {
           <span>sandbox</span>
           <span className="text-accent">ready</span>
           <span className="text-[#2a2a2a]">|</span>
-          <span>gemini-2.0-flash</span>
+          <span>gemini-2.5-flash</span>
           <span className="text-[#2a2a2a]">·</span>
           <span>duckdb</span>
           <span className="text-[#2a2a2a]">|</span>

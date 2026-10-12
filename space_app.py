@@ -45,7 +45,7 @@ sys.path.insert(0, str(ROOT / "backend"))
 # Setara blok ENV di Dockerfile. Pakai setdefault supaya Variables / Secrets yang
 # diisi di setelan Space tetap menang.
 os.environ.setdefault("USE_DOCKER", "false")  # Space bukan Docker-in-Docker → sandbox subprocess
-os.environ.setdefault("GEMINI_MODEL", "gemini-2.0-flash")
+os.environ.setdefault("GEMINI_MODEL", "gemini-2.5-flash")
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/mpl")  # home di Space tidak selalu writable
 os.environ.setdefault("PYTHONUNBUFFERED", "1")
 

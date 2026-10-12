@@ -90,7 +90,7 @@ cara reproduksinya ada di [`docs/EVAL_SCORECARD.md`](docs/EVAL_SCORECARD.md).
 | Biaya per query | tidak terinstrumentasi |
 
 **Angka ini batas bawah, bukan performa sistem yang sebenarnya.** Run ini terpaksa memakai
-`gemini-flash-lite-latest`, bukan `gemini-2.0-flash` yang dikonfigurasi repo, karena kuota harian
+`gemini-flash-lite-latest`, bukan `gemini-2.0-flash` yang waktu itu dikonfigurasi repo, karena kuota harian
 free tier model itu sudah habis. Di lima pertanyaan yang sempat kesentuh sebelum kuota mati,
 `gemini-2.5-flash` menjawab benar 5 dari 5 sementara model lite ini cuma 2 dari 5. Run dengan
 model produksi belum dijalankan, dan "biaya per query" belum bisa diisi karena `cost_usd` memang
@@ -178,7 +178,7 @@ sebelumnya ada di [`docs/ADVERSARIAL_EVAL.md`](docs/ADVERSARIAL_EVAL.md).
 
 ## Stack
 
-Python · FastAPI + SSE · **Gemini** (`gemini-2.0-flash`) · DuckDB · Docker sandbox ·
+Python · FastAPI + SSE · **Gemini** (`gemini-2.5-flash`, plus model cadangan otomatis) · DuckDB · Docker sandbox ·
 SQLAlchemy 2.0 + SQLite · scipy/statsmodels · **Next.js 14** (App Router) + Tailwind.
 
 ## Run Locally
@@ -189,7 +189,7 @@ Butuh 2 terminal. Prasyarat: **Python 3.11/3.12**, **Node 18+**, **Gemini API ke
 `/.env` (root, dibaca backend):
 ```ini
 GEMINI_API_KEY=<key-kamu>
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 DATABASE_URL=sqlite:///./backend/analyst.db
 USE_DOCKER=false
 ```

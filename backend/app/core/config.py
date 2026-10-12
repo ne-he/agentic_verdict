@@ -24,7 +24,9 @@ class Settings(BaseSettings):
 
     # LLM
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash-lite"
+    gemini_model: str = "gemini-2.5-flash-lite"
+    # Dipakai berurutan kalau model utama sudah dipensiunkan (404) atau kuota hariannya habis.
+    gemini_fallback_models: str = "gemini-flash-latest,gemini-2.5-flash-lite"
 
     # Database
     database_url: str = "sqlite:///./backend/analyst.db"

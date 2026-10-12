@@ -24,7 +24,7 @@ RUN mkdir -p backend/sandbox/tmp backend/sandbox/artifacts \
     && chmod -R 777 backend/sandbox
 
 ENV USE_DOCKER=false \
-    GEMINI_MODEL=gemini-2.0-flash \
+    GEMINI_MODEL=gemini-2.5-flash \
     PYTHONUNBUFFERED=1 \
     MPLCONFIGDIR=/tmp/mpl
 

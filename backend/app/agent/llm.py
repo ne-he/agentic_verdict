@@ -51,10 +51,26 @@ def _is_daily_quota_exhausted(err: Exception) -> bool:
     return has_per_day and (not has_per_minute or retry_delay > 120)
 
 
-def make_gemini_generate(model: str | None = None) -> GenerateFn:
-    """Bikin fungsi generate yang memanggil Gemini (JSON mode) dgn retry saat rate-limit."""
+def model_chain(primary: str | None = None) -> list[str]:
+    """Model utama lalu cadangan dari GEMINI_FALLBACK_MODELS, urut dan tanpa duplikat."""
     settings = get_settings()
-    model_name = model or settings.gemini_model
+    names = [primary or settings.gemini_model, *settings.gemini_fallback_models.split(",")]
+    chain: list[str] = []
+    for name in (n.strip() for n in names):
+        if name and name not in chain:
+            chain.append(name)
+    return chain
+
+
+def make_gemini_generate(model: str | None = None) -> GenerateFn:
+    """Bikin fungsi generate yang memanggil Gemini (JSON mode) dgn retry saat rate-limit.
+
+    Kalau model sudah dipensiunkan Google (404) atau kuota hariannya habis, panggilan pindah
+    ke model berikutnya di `model_chain`. Tanpa ini demo publik mati total: 11 Okt 2026 semua
+    analisis gagal karena `gemini-2.0-flash` sudah tidak tersedia.
+    """
+    settings = get_settings()
+    models = model_chain(model)
 
     def generate(prompt: str) -> str:  # pragma: no cover - butuh API key
         from google import genai
@@ -70,32 +86,44 @@ def make_gemini_generate(model: str | None = None) -> GenerateFn:
         from requests.exceptions import ConnectionError as ReqConnectionError
 
         last_err: Exception | None = None
-        for attempt in range(_MAX_RETRIES):
-            try:
-                resp = client.models.generate_content(
-                    model=model_name, contents=prompt, config=config
-                )
-                return resp.text or ""
-            except ClientError as e:
-                # Attribute di google-genai SDK adalah `code`, bukan `status_code`
-                if getattr(e, "code", None) != 429:
-                    raise
-                last_err = e
-                if _is_daily_quota_exhausted(e):
-                    raise RuntimeError(
-                        f"Gemini daily quota habis untuk model '{model_name}'. "
-                        "Ganti GEMINI_MODEL di .env ke model lain atau tunggu reset besok.\n"
-                        "Cek kuota di: https://ai.dev/rate-limit"
-                    ) from e
-                wait = _retry_delay_from_error(e)
-                print(f"[llm] rate-limit 429, tunggu {wait:.0f}s (percobaan {attempt + 1}/{_MAX_RETRIES})")
-                time.sleep(wait)
-            except ReqConnectionError as e:
-                # Transient network error (RemoteDisconnected, connection reset, dsb)
-                last_err = e
-                wait = 5.0 * (attempt + 1)  # backoff bertahap: 5s, 10s, 15s...
-                print(f"[llm] connection error, retry {attempt + 1}/{_MAX_RETRIES} dalam {wait:.0f}s: {e}")
-                time.sleep(wait)
-        raise RuntimeError(f"Gemini gagal setelah {_MAX_RETRIES}x retry") from last_err
+        for i, model_name in enumerate(models):
+            next_model = models[i + 1] if i + 1 < len(models) else None
+            for attempt in range(_MAX_RETRIES):
+                try:
+                    resp = client.models.generate_content(
+                        model=model_name, contents=prompt, config=config
+                    )
+                    return resp.text or ""
+                except ClientError as e:
+                    # Attribute di google-genai SDK adalah `code`, bukan `status_code`
+                    code = getattr(e, "code", None)
+                    last_err = e
+                    if code == 404 and next_model:
+                        print(f"[llm] model '{model_name}' tidak tersedia (404), pindah ke '{next_model}'")
+                        break
+                    if code != 429:
+                        raise
+                    if _is_daily_quota_exhausted(e):
+                        if next_model:
+                            print(f"[llm] kuota harian '{model_name}' habis, pindah ke '{next_model}'")
+                            break
+                        raise RuntimeError(
+                            f"Gemini daily quota habis untuk model '{model_name}' (model terakhir di rantai). "
+                            "Ganti GEMINI_MODEL / GEMINI_FALLBACK_MODELS atau tunggu reset besok.\n"
+                            "Cek kuota di: https://ai.dev/rate-limit"
+                        ) from e
+                    wait = _retry_delay_from_error(e)
+                    print(f"[llm] rate-limit 429, tunggu {wait:.0f}s (percobaan {attempt + 1}/{_MAX_RETRIES})")
+                    time.sleep(wait)
+                except ReqConnectionError as e:
+                    # Transient network error (RemoteDisconnected, connection reset, dsb)
+                    last_err = e
+                    wait = 5.0 * (attempt + 1)  # backoff bertahap: 5s, 10s, 15s...
+                    print(f"[llm] connection error, retry {attempt + 1}/{_MAX_RETRIES} dalam {wait:.0f}s: {e}")
+                    time.sleep(wait)
+            else:
+                # Retry habis tanpa pindah model: limit per menit atau koneksi terus gagal.
+                raise RuntimeError(f"Gemini gagal setelah {_MAX_RETRIES}x retry") from last_err
+        raise RuntimeError(f"Semua model Gemini gagal: {', '.join(models)}") from last_err
 
     return generate

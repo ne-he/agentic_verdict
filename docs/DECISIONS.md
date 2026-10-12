@@ -75,3 +75,14 @@
     dikarang. `calibration_report.py` menolak menulis angka kecuali dipaksa `--allow-empty`,
     yang hasilnya berupa laporan berstatus menunggu. n maksimum realistis hari ini 20, bukan
     150 seperti di brief, karena gold set cuma satu dataset berisi 20 pertanyaan.
+
+## 2026-10-12, perbaikan demo mati karena model dipensiunkan
+
+15. **Gemini dipanggil lewat rantai model, bukan satu model.** 11 Okt 2026 semua analisis di
+    Space gagal dengan 404 karena Google sudah mematikan `gemini-2.0-flash`, sementara
+    `/health` tetap menjawab ok. Model produksi sekarang `gemini-2.5-flash` (di eval kecil
+    Agustus menjawab benar 5 dari 5, lite cuma 2 dari 5). `make_gemini_generate` pindah ke model
+    berikutnya di `GEMINI_FALLBACK_MODELS` (default `gemini-flash-latest`, lalu
+    `gemini-2.5-flash-lite`) kalau model sekarang menjawab 404 atau kuota hariannya habis.
+    Error lain tetap langsung dilempar supaya bug asli tidak tertutup. Konsekuensi: angka eval
+    dari run yang sempat pindah model harus menyebut model yang benar-benar menjawab.
