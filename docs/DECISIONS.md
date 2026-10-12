@@ -83,6 +83,7 @@
     `/health` tetap menjawab ok. Model produksi sekarang `gemini-2.5-flash` (di eval kecil
     Agustus menjawab benar 5 dari 5, lite cuma 2 dari 5). `make_gemini_generate` pindah ke model
     berikutnya di `GEMINI_FALLBACK_MODELS` (default `gemini-flash-latest`, lalu
-    `gemini-2.5-flash-lite`) kalau model sekarang menjawab 404 atau kuota hariannya habis.
+    `gemini-2.5-flash-lite`) kalau model sekarang menjawab 404, kuota hariannya habis, atau
+    tetap 503 setelah dua percobaan (12 Okt 2026 satu 503 "high demand" menghentikan run di tengah).
     Error lain tetap langsung dilempar supaya bug asli tidak tertutup. Konsekuensi: angka eval
     dari run yang sempat pindah model harus menyebut model yang benar-benar menjawab.

@@ -17,6 +17,8 @@ GenerateFn = Callable[[str], str]
 # Free tier Gemini = 5 request/menit. Retry otomatis saat 429 supaya loop tak crash.
 _MAX_RETRIES = 5
 _DEFAULT_BACKOFF = 20.0  # detik, kalau API tak kasih retryDelay
+# 503 "high demand" biasanya sementara. Dua percobaan per model, lalu pindah ke cadangan.
+_SERVER_RETRIES = 2
 
 
 def _retry_delay_from_error(err: Exception) -> float:
@@ -65,8 +67,8 @@ def model_chain(primary: str | None = None) -> list[str]:
 def make_gemini_generate(model: str | None = None) -> GenerateFn:
     """Bikin fungsi generate yang memanggil Gemini (JSON mode) dgn retry saat rate-limit.
 
-    Kalau model sudah dipensiunkan Google (404) atau kuota hariannya habis, panggilan pindah
-    ke model berikutnya di `model_chain`. Tanpa ini demo publik mati total: 11 Okt 2026 semua
+    Kalau model sudah dipensiunkan Google (404), kuota hariannya habis, atau terus sibuk (5xx),
+    panggilan pindah ke model berikutnya di `model_chain`. Tanpa ini demo publik mati total: 11 Okt 2026 semua
     analisis gagal karena `gemini-2.0-flash` sudah tidak tersedia.
     """
     settings = get_settings()
@@ -75,7 +77,7 @@ def make_gemini_generate(model: str | None = None) -> GenerateFn:
     def generate(prompt: str) -> str:  # pragma: no cover - butuh API key
         from google import genai
         from google.genai import types
-        from google.genai.errors import ClientError
+        from google.genai.errors import ClientError, ServerError
 
         if not settings.gemini_api_key:
             raise RuntimeError("GEMINI_API_KEY belum di-set di .env")
@@ -114,6 +116,16 @@ def make_gemini_generate(model: str | None = None) -> GenerateFn:
                         ) from e
                     wait = _retry_delay_from_error(e)
                     print(f"[llm] rate-limit 429, tunggu {wait:.0f}s (percobaan {attempt + 1}/{_MAX_RETRIES})")
+                    time.sleep(wait)
+                except ServerError as e:
+                    # 12 Okt 2026: run di Space berhenti di tengah jalan karena satu 503 dari Gemini.
+                    last_err = e
+                    code = getattr(e, "code", "5xx")
+                    if next_model and attempt + 1 >= _SERVER_RETRIES:
+                        print(f"[llm] '{model_name}' sibuk ({code}), pindah ke '{next_model}'")
+                        break
+                    wait = 3.0 * (attempt + 1)
+                    print(f"[llm] server error {code}, retry {attempt + 1}/{_MAX_RETRIES} dalam {wait:.0f}s")
                     time.sleep(wait)
                 except ReqConnectionError as e:
                     # Transient network error (RemoteDisconnected, connection reset, dsb)
