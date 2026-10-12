@@ -189,6 +189,11 @@ def _run_subprocess(code: str, dataset_path: str, timeout: int) -> SandboxResult
     env["MPLBACKEND"] = "Agg"
     env["MPLCONFIGDIR"] = str(run_dir)  # matplotlib butuh dir cache yang bisa ditulis
     env["PYTHONDONTWRITEBYTECODE"] = "1"
+    # Satu thread untuk BLAS/OpenMP. Tanpa ini OpenBLAS memesan buffer untuk tiap inti host,
+    # dan di host Space yang intinya banyak pesanan itu menabrak RLIMIT_AS di bawah, sehingga
+    # impor numpy bisa macet sampai timeout. Dataset demo kecil, satu thread sudah cukup.
+    for _var in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_MAX_THREADS"):
+        env[_var] = "1"
 
     # Resource limit hanya tersedia di POSIX.
     preexec = None

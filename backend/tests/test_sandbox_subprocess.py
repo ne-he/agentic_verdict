@@ -58,6 +58,17 @@ def test_subprocess_does_not_leak_secret(monkeypatch):
     assert "SECRET_SHOULD_NOT_LEAK" not in res.stdout
 
 
+def test_subprocess_blas_single_thread():
+    # Host Space punya banyak inti: OpenBLAS per inti + RLIMIT_AS 512 MB bikin numpy macet.
+    code = (
+        "import os\n"
+        "print([os.environ.get(k) for k in ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS')])\n"
+    )
+    res = _run_subprocess(code, DATASET, timeout=60)
+    assert res.ok, res.stderr
+    assert "['1', '1', '1']" in res.stdout
+
+
 def test_subprocess_timeout_does_not_hang():
     res = _run_subprocess("while True:\n    pass\n", DATASET, timeout=3)
     assert res.timed_out is True
